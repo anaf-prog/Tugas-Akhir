@@ -1,0 +1,41 @@
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Log Ping</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nama Perangkat</th>
+                                <th>Ping</th>
+                                <th>IP</th>
+                                <th>Status</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="log : ${latestLogs}" th:attr="data-device-id=${log.device.id}">
+                                <td th:text="${log.device.deviceName}">Router Utama</td>
+                                <td>
+                                    <div class="ping-indicator" 
+                                        th:classappend="${log.pingStatus} ? 'ping-active' : 'ping-inactive'">
+                                        <div class="ping-light"></div>
+                                    </div>
+                                </td>
+                                <td th:text="${log.device.ipAddress}">192.168.1.1</td>
+                                <td>
+                                    <span class="badge bg-success" th:if="${log.pingStatus}">ONLINE</span>
+                                    <span class="badge bg-danger" th:unless="${log.pingStatus}">OFFLINE</span>
+                                </td>
+                                <td class="ping-time" th:text="${#dates.format(log.monitoring, 'yyyy-MM-dd HH:mm:ss')}">2025-05-01 16:11:12</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

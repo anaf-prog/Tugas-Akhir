@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Laporan - Inventory Perangkat Jaringan</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/report.css}">
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+
+    <!-- flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+</head>
+<body>
+
+    <!-- ========== Sidebar & Topbar ========== -->
+    <div class="wrapper">
+        
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark text-white">
+            <div class="sidebar-header p-3">
+                <h4><i class="fas fa-network-wired me-2"></i> Network Inventory</h4>
+            </div>
+            <ul class="list-unstyled components">
+                <li>
+                    <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-server me-2"></i> Perangkat</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-map-marker-alt me-2"></i> Lokasi</a>
+                </li>
+                <li class="active">
+                    <a th:href="@{/reports}"><i class="fas fa-chart-bar me-2"></i> Laporan</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Modal Konfirmasi Penghapusan -->
+            <div th:insert="~{fragments/modal-confirm-report.html}"></div>
+            
+            <!-- Modal Buat Laporan -->
+            <div class="modal fade" id="createReportModal" tabindex="-1" aria-labelledby="createReportModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createReportModalLabel">Buat Laporan Perbaikan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form th:action="@{/reports}" method="post" id="reportForm">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="deviceId" class="form-label">Perangkat</label>
+                                    <select class="form-select" id="deviceId" name="deviceId" required>
+                                        <option value="">Pilih Perangkat</option>
+                                        <option th:each="device : ${devices}" 
+                                                th:value="${device.id}"
+                                                th:text="${device.deviceName + ' (' + device.ipAddress + ')'}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="issueDate" class="form-label">Tanggal Masalah</label>
+                                    <input type="datetime-local" class="form-control" id="issueDate" name="issueDate" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="issueDescription" class="form-label">Deskripsi Masalah</label>
+                                    <textarea class="form-control" id="issueDescription" name="issueDescription" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="repairDate" class="form-label">Tanggal Perbaikan</label>
+                                    <input type="datetime-local" class="form-control" id="repairDate" name="repairDate" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="repairDescription" class="form-label">Tindakan Perbaikan</label>
+                                    <textarea class="form-control" id="repairDescription" name="repairDescription" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="technician" class="form-label">Teknisi</label>
+                                    <input type="text" class="form-control" id="technician" name="technician" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status" name="status" required>
+                                        <option value="SELESAI">Selesai</option>
+                                        <option value="DALAM_PERBAIKAN">Dalam Perbaikan</option>
+                                        <option value="DITUNDA">Ditunda</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Simpan Laporan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="ms-auto d-flex align-items-center">
+                        <span class="me-3">Hi, <strong>Admin</strong></span>
+                        <img src="https://via.placeholder.com/40" class="rounded-circle" alt="Profile">
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Notifikasi -->
+            <div class="container mt-3">
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- ========== Laporan Content ========== -->
+            <div class="container-fluid p-4">
+                <div class="card shadow">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Daftar Laporan Perbaikan</h5>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createReportModal">
+                            <i class="fas fa-plus me-1"></i> Buat Laporan
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="reportsTable" class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Perangkat</th>
+                                        <th>Tanggal Masalah</th>
+                                        <th>Status</th>
+                                        <th>Teknisi</th>
+                                        <th>Tanggal Perbaikan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="report, iterStat : ${reports}">
+                                        <td th:text="${iterStat.count}">1</td>
+                                        <td>
+                                            <span th:text="${report.device.deviceName}"></span>
+                                            <small class="text-muted d-block" th:text="${report.device.ipAddress}"></small>
+                                        </td>
+                                        <td th:text="${#temporals.format(report.issueDate, 'dd-MM-yyyy HH:mm')}"></td>
+                                        <td>
+                                            <span th:if="${report.status.name() == 'SELESAI'}" class="badge bg-success">Selesai</span>
+                                            <span th:if="${report.status.name() == 'DALAM_PERBAIKAN'}" class="badge bg-warning text-dark">Dalam Perbaikan</span>
+                                            <span th:if="${report.status.name() == 'DITUNDA'}" class="badge bg-secondary">Ditunda</span>
+                                        </td>
+                                        <td th:text="${report.technician}"></td>
+                                        <td th:text="${#temporals.format(report.repairDate, 'dd-MM-yyyy HH:mm')}"></td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <a th:href="@{/reports/view/{id}(id=${report.id})}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/reports/edit/{id}(id=${report.id})}" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-danger delete-btn" th:data-id="${report.id}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+    
+    <!-- Custom JS -->
+    <script th:src="@{/js/reports.js}"></script>
+    <script th:src="@{/js/modalDeleteReport.js}"></script>
+    <script th:src="@{/js/notifikasiReport.js}"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+/* Layout Utama */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    min-height: 100vh;
+}
+
+/* Style untuk notifikasi */
+#content .container.mt-3 {
+    margin-top: 1rem !important;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Pastikan notifikasi tidak melebar */
+#content .alert {
+    max-width: 100%;
+}
+
+/* Sidebar */
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #343a40;
+    color: #fff;
+    transition: all 0.3s;
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+/* Konten Utama */
+#content {
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    transition: all 0.3s;
+    margin-left: 250px;
+}
+
+#content.active {
+    width: 100%;
+    margin-left: 0;
+}
+
+/* Topbar */
+.navbar {
+    padding: 15px 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+/* Sidebar Item */
+#sidebar .components {
+    padding: 20px 0;
+}
+
+#sidebar .components li a {
+    padding: 10px 15px;
+    display: block;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#sidebar .components li a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+}
+
+#sidebar .components li.active a {
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    
+    #sidebar.active {
+        margin-left: 0;
+    }
+    
+    #content {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    #content.active {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+}
+
+/* Card hover effect */
+.card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Style untuk tombol aksi */
+.table td .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+/* Alternatif: menggunakan flexbox untuk sel td */
+.table td {
+    vertical-align: middle;
+}
+
+.table td .d-flex {
+    flex-wrap: nowrap;
+}
+
+/* Style untuk select multiple */
+select[multiple] {
+    min-height: 150px;
+}
+select[multiple] option {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Gaya untuk indikator ping */
+.ping-indicator {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ping-light {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.ping-active .ping-light {
+    background-color: #28a745; /* Hijau */
+    animation: ping-blink 2s infinite;
+}
+
+.ping-inactive .ping-light {
+    background-color: #dc3545; /* Merah */
+}
+
+/* Ketika sedang proses ping (30 detik pertama) */
+.ping-active.pinging .ping-light {
+    animation: none !important;
+    opacity: 1 !important;
+}
+
+
+@keyframes ping-blink {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}

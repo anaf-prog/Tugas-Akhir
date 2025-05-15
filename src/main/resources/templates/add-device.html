@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Perangkat - Inventory Jaringan</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <!-- ========== Sidebar & Topbar ========== -->
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark text-white">
+            <div class="sidebar-header p-3">
+                <h4><i class="fas fa-network-wired me-2"></i> Network Inventory</h4>
+            </div>
+            <ul class="list-unstyled components">
+                <li>
+                    <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+                </li>
+                <li class="active">
+                    <a href="#"><i class="fas fa-server me-2"></i> Perangkat</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-map-marker-alt me-2"></i> Lokasi</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-chart-bar me-2"></i> Laporan</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="ms-auto d-flex align-items-center">
+                        <span class="me-3">Hi, <strong>Admin</strong></span>
+                        <img src="https://via.placeholder.com/40" class="rounded-circle" alt="Profile">
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="container-fluid mt-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h3><i class="fas fa-plus-circle me-2"></i> Tambah Perangkat Baru</h3>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="#">Perangkat</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Tambah Perangkat</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Form Tambah Perangkat -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Form Tambah Perangkat</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/devices/add}" th:object="${device}" method="post">
+                                    <div class="row">
+                                        <!-- Kolom Kiri -->
+                                        <div class="col-md-6">
+                                            <!-- Nama Perangkat -->
+                                            <div class="mb-3">
+                                                <label for="deviceName" class="form-label">Nama Perangkat</label>
+                                                <input type="text" class="form-control" id="deviceName" 
+                                                       th:field="*{deviceName}"
+                                                       th:classappend="${#fields.hasErrors('deviceName')} ? 'is-invalid' : ''"
+                                                       required>
+                                                <div class="invalid-feedback" th:if="${#fields.hasErrors('deviceName')}" 
+                                                     th:errors="*{deviceName}"></div>
+                                            </div>
+                                            
+                                            <!-- IP Address -->
+                                            <div class="mb-3">
+                                                <label for="ipAddress" class="form-label">IP Address</label>
+                                                <input type="text" class="form-control" id="ipAddress" 
+                                                       th:field="*{ipAddress}"
+                                                       th:classappend="${#fields.hasErrors('ipAddress')} ? 'is-invalid' : ''"
+                                                       required>
+                                                <div class="invalid-feedback" th:if="${#fields.hasErrors('ipAddress')}" 
+                                                     th:errors="*{ipAddress}"></div>
+                                            </div>
+                                            
+                                            <!-- MAC Address -->
+                                            <div class="mb-3">
+                                                <label for="macAddress" class="form-label">MAC Address</label>
+                                                <input type="text" class="form-control" id="macAddress" 
+                                                       th:field="*{macAddress}"
+                                                       placeholder="00:1A:2B:3C:4D:5E">
+                                            </div>
+                                            
+                                            <!-- Jenis Perangkat -->
+                                            <div class="mb-3">
+                                                <label for="deviceType" class="form-label">Jenis Perangkat</label>
+                                                <select class="form-select" id="deviceType" th:field="*{deviceType}" required>
+                                                    <option value="ROUTER">Router</option>
+                                                    <option value="SWITCH">Switch</option>
+                                                    <option value="SERVER">Server</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Status Device -->
+                                            <div class="mb-3">
+                                                <label for="statusDevice" class="form-label">Status Perangkat</label>
+                                                <select class="form-select" id="statusDevice" th:field="*{statusDevice}" required>
+                                                    <option value="ONLINE">Online</option>
+                                                    <option value="OFFLINE">Offline</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <!-- Ping Status -->
+                                            <div class="mb-3">
+                                                <label for="pingStatus" class="form-label">Status Ping</label>
+                                                <select class="form-select" id="pingStatus" th:field="*{pingStatus}" required>
+                                                    <option value="ONLINE">Online</option>
+                                                    <option value="OFFLINE">Offline</option>
+                                                    <option value="PINGING">Pinging</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                        
+                                        <!-- Kolom Kanan -->
+                                        <div class="col-md-6">
+                                            <!-- Nama Lokasi -->
+                                            <div class="mb-3">
+                                                <label for="locationName" class="form-label">Nama Lokasi</label>
+                                                <input type="text" class="form-control" id="locationName" 
+                                                    name="locationName" placeholder="Contoh: Gedung Utama, Jakarta">
+                                            </div>
+
+                                             <!-- Gedung -->
+                                            <div class="mb-3">
+                                                <label for="building" class="form-label">Gedung</label>
+                                                <input type="text" class="form-control" id="building" 
+                                                    name="building" placeholder="Contoh: Gedung A">
+                                            </div>
+
+                                            <!-- Lantai -->
+                                            <div class="mb-3">
+                                                <label for="floor" class="form-label">Lantai</label>
+                                                <input type="text" class="form-control" id="floor" 
+                                                    name="floor" placeholder="Contoh: Lantai 2">
+                                            </div>
+                                            
+                                            <!-- Ruangan -->
+                                            <div class="mb-3">
+                                                <label for="room" class="form-label">Ruangan</label>
+                                                <input type="text" class="form-control" id="room" 
+                                                    name="room" placeholder="Contoh: Ruang Server">
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2 mt-4">
+                                        <a th:href="@{/dashboard}" class="btn btn-secondary">Batal</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i> Simpan Perangkat
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!-- Card Stats -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Total Perangkat</h6>
+                        <h2 th:text="${totalDevices}">0</h2>
+                    </div>
+                    <i class="fas fa-server fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Perangkat Aktif</h6>
+                        <h2 th:text="${activeDevices}">0</h2>
+                    </div>
+                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-dark shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Perangkat Down</h6>
+                        <h2 th:text="${downDevices}">0</h2>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Lokasi</h6>
+                        <h2 th:text="${totalLocations}">0</h2>
+                    </div>
+                    <i class="fas fa-map-marker-alt fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
