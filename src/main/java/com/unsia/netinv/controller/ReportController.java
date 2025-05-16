@@ -22,10 +22,12 @@ import com.unsia.netinv.dto.ReportEdit;
 import com.unsia.netinv.dto.ReportForm;
 import com.unsia.netinv.entity.Device;
 import com.unsia.netinv.entity.Report;
+import com.unsia.netinv.entity.Users;
 import com.unsia.netinv.netinve.ReportStatus;
 import com.unsia.netinv.repository.DeviceRepository;
 import com.unsia.netinv.repository.ReportRepository;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -72,10 +74,18 @@ public class ReportController {
     }
 
     @GetMapping
-    public String listReports(Model model) {
+    public String listReports(Model model, HttpSession session) {
+
+        Users user = (Users) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         List<Report> reports = reportRepository.findAll();
         List<Device> devices = deviceRepository.findAll();
 
+        model.addAttribute("currentUser", user.getUsername());
+        model.addAttribute("userRole", user.getRole());
         model.addAttribute("reports", reports);
         model.addAttribute("devices", devices);
         return "reports";
