@@ -21,5 +21,24 @@ public class UserServiceImpl implements UserService {
     public Users findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    @Override
+    public Users registeruser(Users user) {
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("VIEWER");
+        }
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean isUsernameExists(String username) {
+        return userRepository.findByUsername(username) != null;
+    }
+
+    @Override
+    public boolean isEmailExists(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
     
 }
