@@ -1,25 +1,46 @@
-// package com.unsia.netinv.controller;
+package com.unsia.netinv.controller;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.PostMapping;
-// import org.springframework.web.bind.annotation.RequestMapping;
-// import org.springframework.web.bind.annotation.RequestParam;
-// import org.springframework.web.bind.annotation.RestController;
+import java.util.Set;
 
-// import com.unsia.netinv.service.SimulationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-// @RestController
-// @RequestMapping("/api/failover")
-// public class FailoverController {
+import com.unsia.netinv.service.SimulationService;
 
-//     @Autowired
-//     SimulationService simulationService;
+@RestController
+@RequestMapping("/api/simulation")
+public class FailoverController {
 
-//     @PostMapping("/simulation")
-//     public ResponseEntity<String> simulationFailure(@RequestParam Long deviceId) {
-//         simulationService.simulationDeviceFailure(deviceId);
-//         return ResponseEntity.ok("Failover simulation triggered for device: " + deviceId);
-//     }
+    @Autowired
+    SimulationService simulation;
+
+    @PostMapping("/schedule-failure")
+    public String scheduleFailure(@RequestParam String ipAddress,
+                                  @RequestParam int minutesToFailure) {
+
+        simulation.scheduleFailure(ipAddress, minutesToFailure);
+        return "Failure scheduled for " + ipAddress + " in " + minutesToFailure + " minutes";
+    }
+
+    @PostMapping("/recover")
+    public String recoveryDevice(@RequestParam(required = false) String ipAddress) {
+        if (ipAddress != null) {
+            simulation.recoveryDevice(ipAddress);
+            return "Device " + ipAddress + " recovered";
+        } else {
+            simulation.recoveryAllDevices();
+            return "All devices recovered";
+        }
+
+    }
     
-// }
+    @GetMapping("failed-device")
+    public Set<String> getFaileddevice() {
+        return simulation.getFaileddevices();
+    }
+    
+}

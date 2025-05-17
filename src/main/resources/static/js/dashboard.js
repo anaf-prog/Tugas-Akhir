@@ -64,6 +64,12 @@ $(document).ready(function () {
     function updateDeviceStatus() {
         $.get(window.location.href, function(data) {
             var newDoc = $(data);
+
+            // Update card dashboard
+            $('.card-stats .card-body h2').each(function(index) {
+                var newValue = newDoc.find('.card-stats .card-body h2').eq(index).text();
+                $(this).text(newValue);
+            });
             
             // Update tabel perangkat
             $('.table-responsive:first table tbody').html(
@@ -76,16 +82,16 @@ $(document).ready(function () {
             );
             
             // Update counter
-            $('.card-counter').each(function() {
-                var counterType = $(this).data('counter');
-                var newValue = newDoc.find('[data-counter="' + counterType + '"]').text();
-                $(this).text(newValue);
-            });
+            // $('.card-counter').each(function() {
+            //     var counterType = $(this).data('counter');
+            //     var newValue = newDoc.find('[data-counter="' + counterType + '"]').text();
+            //     $(this).text(newValue);
+            // });
         });
     }
     
     // Jalankan setiap 30 detik
-    setInterval(updateDeviceStatus, 30000);
+    setInterval(updateDeviceStatus, 5000);
     
     // Animasi ping indicator
     setInterval(function() {

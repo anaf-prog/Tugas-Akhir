@@ -23,7 +23,7 @@ import com.unsia.netinv.repository.MonitoringLogRepository;
 
 @Service
 public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
-    private static final Logger logger = LoggerFactory.getLogger(NetworkMonitoringServiceImpl.class);
+    // private static final Logger logger = LoggerFactory.getLogger(NetworkMonitoringServiceImpl.class);
 
     @Autowired
     private DeviceRepository deviceRepository;
@@ -41,7 +41,8 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     @Scheduled(fixedRate = 60000) 
     public void monitoringAlldevices() {
         List<Device> devices = deviceRepository.findAll();
-        logger.info("Starting monitoring for {} devices ...", devices.size());
+        // logger.info("Starting monitoring for {} devices ...", devices.size());
+        System.out.println("Starting monitoring for {} devices ..." + devices.size());
 
         for (Device device : devices) {
             try {
@@ -59,24 +60,42 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
                         try {
                             failoverService.activateBackupRoute(device.getId());
                         } catch (Exception e) {
-                            logger.error("Gagal failover untuk perangkat ", device.getDeviceName(), e.getMessage());
+                            // logger.error("Gagal failover untuk perangkat ", device.getDeviceName(), e.getMessage());
+                            System.out.println("Gagal failover untuk perangkat " + device.getDeviceName() + e.getMessage());
                         }
                     }
                 }
 
-                if (statusChanged || isAnomaly) {
-                    createNewLog(device, isOnline, responseTime, statusChanged ? LogReason.STATUS_CHANGE : LogReason.ANOMALY);
+                if (statusChanged) {
+                    device.setStatusDevice(newStatus);
+                    deviceRepository.save(device);
+                    
+                    // Gunakan DOWN atau RECOVERED berdasarkan status
+                    LogReason reason = isOnline ? LogReason.RECOVERED : LogReason.DOWN;
+                    createNewLog(device, isOnline, responseTime, reason);
+                    
+                    if (!isOnline) {
+                        failoverService.activateBackupRoute(device.getId());
+                    }
+                } else if (isAnomaly) {
+                    createNewLog(device, isOnline, responseTime, LogReason.HIGH_LATENCY);
                 } else {
                     updateLastLog(device, isOnline, responseTime);
                 }
 
-                logger.info("Device {} ({}): Status {} - Response Time {} ms",
-                    device.getDeviceName(), device.getIpAddress(), 
-                    newStatus,
-                    responseTime != null ? responseTime : "N/A");
+                // logger.info("Device {} ({}): Status {} - Response Time {} ms",
+                //     device.getDeviceName(), device.getIpAddress(), 
+                //     newStatus,
+                //     responseTime != null ? responseTime : "N/A");
+
+                // System.out.println("Device {} ({}): Status {} - Response Time {} ms" +
+                //     device.getDeviceName() + device.getIpAddress() + 
+                //     newStatus +
+                //     responseTime != null ? responseTime : "N/A");    
 
             } catch (Exception e) {
-                logger.error("Error monitoring device {}: {}", device.getDeviceName(), e.getMessage());
+                // logger.error("Error monitoring device {}: {}", device.getDeviceName(), e.getMessage());
+                System.out.println("Error monitoring device {}: {}" + device.getDeviceName() + e.getMessage());
             }
         }
     }
@@ -95,31 +114,34 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
         log.setLogReason(reason);
         monitoringLogRepository.save(log);
 
-        logger.debug("Created NEW log for device {} with reason {}", device.getDeviceName(), reason);
+        // logger.debug("Created NEW log for device {} with reason {}", device.getDeviceName(), reason);
+        System.out.println("Created NEW log for device {} with reason {}" + device.getDeviceName() + reason);
     }
 
     private void updateLastLog(Device device, boolean isOnline, Long responseTime) {
         Pageable latest = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "monitoring"));
         Optional<MonitoringLog> lastLogOpt = monitoringLogRepository.findTopByDeviceOrderByMonitoringDesc(device);
 
-        System.out.println("Latest : " + latest);
+        // System.out.println("Latest : " + latest);
         
         if (lastLogOpt.isPresent()) {
             MonitoringLog lastLog = lastLogOpt.get();
-            // Update log yang ada jika reason-nya REGULAR_UPDATE
-            if (lastLog.getLogReason() == LogReason.REGULAR_UPDATE) {
+            // Update log yang ada jika reason-nya Normal
+            if (lastLog.getLogReason() == LogReason.NORMAL || lastLog.getPingStatus() == isOnline) {
                 lastLog.setPingStatus(isOnline);
                 lastLog.setResponseTime(responseTime != null ? responseTime.intValue() : null);
                 lastLog.setMonitoring(new Date());
                 monitoringLogRepository.save(lastLog);
-                logger.debug("UPDATED existing log for device {}", device.getDeviceName());
+                // logger.debug("UPDATED existing log for device {}", device.getDeviceName());
+                // System.out.println("UPDATED existing log for device {}" + device.getDeviceName());
             } else {
-                // Buat log baru jika log terakhir bukan REGULAR_UPDATE
-                createNewLog(device, isOnline, responseTime, LogReason.REGULAR_UPDATE);
+                // Buat log baru jika log terakhir bukan Normal
+                LogReason reason = isOnline ? LogReason.RECOVERED : LogReason.DOWN;
+                createNewLog(device, isOnline, responseTime, reason);
             }
         } else {
             // Buat log baru jika tidak ada log sama sekali
-            createNewLog(device, isOnline, responseTime, LogReason.REGULAR_UPDATE);
+            createNewLog(device, isOnline, responseTime, LogReason.NORMAL);
         }
     }
 

@@ -39,5 +39,10 @@ public class PingServiceImpl implements PingService {
         }
         return null;
     }
+
+    @Override
+    public void forceFailure(String ipAddress, boolean shouldFail) {
+        deviceStatusSimulation.put(ipAddress, !shouldFail);
+    }
     
 }

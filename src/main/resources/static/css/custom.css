@@ -155,6 +155,7 @@ select[multiple] option {
 
 .ping-inactive .ping-light {
     background-color: #dc3545; /* Merah */
+    opacity: 1 !important;
 }
 
 /* Ketika sedang proses ping (30 detik pertama) */

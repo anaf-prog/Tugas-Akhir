@@ -1,46 +1,83 @@
-// package com.unsia.netinv.service;
+package com.unsia.netinv.service;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Service;
-// import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-// import com.unsia.netinv.entity.Device;
-// import com.unsia.netinv.repository.DeviceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
-// @Service
-// public class SimulationServiceImpl implements SimulationService {
+import jakarta.annotation.PostConstruct;
 
-//     @Autowired
-//     DeviceRepository deviceRepository;
+@Service
+public class SimulationServiceImpl implements SimulationService {
+    private final Map<String, LocalDateTime> failureSchedule = new ConcurrentHashMap<>();
+    private final Set<String> currentlyFailedDevice = ConcurrentHashMap.newKeySet();
 
-//     @Autowired
-//     FailoverService failoverService;
+    @Autowired
+    private PingService pingService;
 
-//     @Transactional
-//     @Override
-//     public void simulationDeviceFailure(Long deviceId) {
-//         System.out.println("============= Start Simulation =====================");
+    @PostConstruct
+    @Override
+    public void init() {
+        scheduleFailure("192.168.1.9", 2);
+    }
 
-//          // 1. Matikan perangkat utama
-//         Device device = deviceRepository.findById(deviceId)
-//             .orElseThrow(() -> new RuntimeException("Device not found!"));
+    @Override
+    public void scheduleFailure(String ipAddress, int minutesToFailure) {
+        LocalDateTime failureTime = LocalDateTime.now().plusMinutes(minutesToFailure);
+        failureSchedule.put(ipAddress, failureTime);
+        System.out.println("Failure scheduled for " + ipAddress + " at " + failureTime);
+    }
 
-//         System.out.println("[1. Main Device Initial] ID: " + device.getId() + " Status: " + device.getStatusDevice());
-        
-//         // 2. Verify database state
-//         Device freshDevice = deviceRepository.getReferenceById(deviceId);
-//         System.out.println("[2. Main Device Fresh From DB] Status: " + freshDevice.getStatusDevice());
- 
-//         device.setStatusDevice("OFFLINE");
-//         Device savedDevice = deviceRepository.save(device);
-//         System.out.println("[3. Main Device After Save] Status: " + savedDevice.getStatusDevice());
+    @Override
+    public void cancelScheduleFailure(String ipAddress) {
+        failureSchedule.remove(ipAddress);
+        System.out.println("Cancelled scheduled failure for : " + ipAddress);
+    }
 
-//         // 4. Verify again
-//         Device updatedDevice = deviceRepository.findById(deviceId).get();
-//         System.out.println("[4. Main Device After Refresh] Status: " + updatedDevice.getStatusDevice());
+    @Override
+    public void recoveryDevice(String ipAddress) {
+        if (currentlyFailedDevice.contains(ipAddress)) {
+            pingService.forceFailure(ipAddress, false);
+            currentlyFailedDevice.remove(ipAddress);
+            System.out.println("Device recovered : " + ipAddress); 
+        }
+    }
 
-//         failoverService.activateBackupRoute(deviceId);
-//         System.out.println("======== END SIMULATION ========");
-//     }
+    @Override
+    public void recoveryAllDevices() {
+        for (String ipAddress : currentlyFailedDevice) {
+            pingService.forceFailure(ipAddress, false);
+        }
+        currentlyFailedDevice.clear();
+        System.out.println("All device recovered");
+    }
+
+    @Scheduled(fixedRate = 6000)
+    @Override
+    public void checkScheduleFailures() {
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Map.Entry<String, LocalDateTime> entry : failureSchedule.entrySet()) {
+            String ipAddress = entry.getKey();
+            LocalDateTime failureTime = entry.getValue();
+
+            if (now.isAfter(failureTime)) {
+                pingService.forceFailure(ipAddress, true);
+                currentlyFailedDevice.add(ipAddress);
+                failureSchedule.remove(ipAddress);
+                System.out.println("Simulasi failure aktif : " + ipAddress);
+            }
+        }
+    }
+
+    @Override
+    public Set<String> getFaileddevices() {
+        return Collections.unmodifiableSet(currentlyFailedDevice);
+    }
     
-// }
+}
