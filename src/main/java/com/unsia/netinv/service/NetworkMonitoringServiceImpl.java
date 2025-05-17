@@ -32,6 +32,9 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     private MonitoringLogRepository monitoringLogRepository;
 
     @Autowired
+    private EmailNotificationService emailNotificationService;
+
+    @Autowired
     private PingService pingService;
 
     @Autowired
@@ -41,7 +44,6 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     @Scheduled(fixedRate = 60000) 
     public void monitoringAlldevices() {
         List<Device> devices = deviceRepository.findAll();
-        // logger.info("Starting monitoring for {} devices ...", devices.size());
         System.out.println("Starting monitoring for {} devices ..." + devices.size());
 
         for (Device device : devices) {
@@ -55,34 +57,25 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
                 if (statusChanged) {
                     device.setStatusDevice(newStatus);
                     deviceRepository.save(device);
-
-                    if (!isOnline) {
-                        try {
-                            failoverService.activateBackupRoute(device.getId());
-                        } catch (Exception e) {
-                            // logger.error("Gagal failover untuk perangkat ", device.getDeviceName(), e.getMessage());
-                            System.out.println("Gagal failover untuk perangkat " + device.getDeviceName() + e.getMessage());
-                        }
-                    }
-                }
-
-                if (statusChanged) {
-                    device.setStatusDevice(newStatus);
-                    deviceRepository.save(device);
                     
                     // Gunakan DOWN atau RECOVERED berdasarkan status
                     LogReason reason = isOnline ? LogReason.RECOVERED : LogReason.DOWN;
                     createNewLog(device, isOnline, responseTime, reason);
                     
                     if (!isOnline) {
-                        failoverService.activateBackupRoute(device.getId());
+                        try {
+                            failoverService.activateBackupRoute(device.getId());
+                            emailNotificationService.sendDeviceDownNotification(device,"Sistem telah melakukan failover otomatis ke perangkat cadangan");
+                        } catch (Exception e) {
+                            System.out.println("Gagal failover untuk perangkat " + device.getDeviceName() + e.getMessage());
+                        }
                     }
                 } else if (isAnomaly) {
                     createNewLog(device, isOnline, responseTime, LogReason.HIGH_LATENCY);
                 } else {
                     updateLastLog(device, isOnline, responseTime);
                 }
-
+                
                 // logger.info("Device {} ({}): Status {} - Response Time {} ms",
                 //     device.getDeviceName(), device.getIpAddress(), 
                 //     newStatus,
@@ -91,10 +84,9 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
                 // System.out.println("Device {} ({}): Status {} - Response Time {} ms" +
                 //     device.getDeviceName() + device.getIpAddress() + 
                 //     newStatus +
-                //     responseTime != null ? responseTime : "N/A");    
+                //     responseTime != null ? responseTime : "N/A"); 
 
             } catch (Exception e) {
-                // logger.error("Error monitoring device {}: {}", device.getDeviceName(), e.getMessage());
                 System.out.println("Error monitoring device {}: {}" + device.getDeviceName() + e.getMessage());
             }
         }
