@@ -1,0 +1,27 @@
+/* Style untuk tombol recovery disabled */
+.btn.recovery-btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* Tooltip untuk tombol disabled */
+.recovery-btn[data-status="true"]::after {
+    content: "Perangkat sudah online";
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+    margin-left: 5px;
+}
+
+.recovery-btn[data-status="true"]:hover::after {
+    visibility: visible;
+    opacity: 1;
+}

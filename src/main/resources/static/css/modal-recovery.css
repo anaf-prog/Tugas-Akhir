@@ -1,0 +1,17 @@
+/* Animasi untuk modal notifikasi */
+#recoveryModal .modal-header {
+    transition: all 0.3s ease;
+}
+
+#recoveryModal .modal-success .modal-header {
+    background-color: #28a745;
+}
+
+#recoveryModal .modal-error .modal-header {
+    background-color: #dc3545;
+}
+
+/* Ukuran modal lebih compact */
+#recoveryModal .modal-dialog {
+    max-width: 400px;
+}

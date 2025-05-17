@@ -2,6 +2,7 @@ package com.unsia.netinv.service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.unsia.netinv.entity.Device;
+import com.unsia.netinv.entity.MonitoringLog;
+import com.unsia.netinv.netinve.LogReason;
+import com.unsia.netinv.repository.DeviceRepository;
+import com.unsia.netinv.repository.MonitoringLogRepository;
 
 import jakarta.annotation.PostConstruct;
 
@@ -19,6 +26,12 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Autowired
     private PingService pingService;
+
+    @Autowired
+    private DeviceRepository deviceRepository;
+
+    @Autowired
+    private MonitoringLogRepository monitoringLogRepository;
 
     @PostConstruct
     @Override
@@ -44,7 +57,23 @@ public class SimulationServiceImpl implements SimulationService {
         if (currentlyFailedDevice.contains(ipAddress)) {
             pingService.forceFailure(ipAddress, false);
             currentlyFailedDevice.remove(ipAddress);
-            System.out.println("Device recovered : " + ipAddress); 
+            System.out.println("Device recovered : " + ipAddress);
+            
+            Device device = deviceRepository.findByIpAddress(ipAddress);
+            if (device != null) {
+                device.setStatusDevice("ONLINE");
+                device.setPingStatus("ONLINE");
+                deviceRepository.save(device);
+
+                MonitoringLog log = new MonitoringLog();
+                log.setDevice(device);
+                log.setPingStatus(true);
+                log.setMonitoring(new Date());
+                log.setLogReason(LogReason.RECOVERED);
+
+                monitoringLogRepository.save(log);
+                
+            }
         }
     }
 

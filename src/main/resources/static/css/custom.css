@@ -133,6 +133,17 @@ select[multiple] option {
     border-bottom: 1px solid #eee;
 }
 
+/* Recovery button styling */
+.recovery-btn {
+    transition: all 0.3s ease;
+    min-width: 90px;
+}
+
+.recovery-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
 /* Gaya untuk indikator ping */
 .ping-indicator {
     width: 30px;

@@ -14,6 +14,7 @@
                                 <th>IP</th>
                                 <th>Status</th>
                                 <th>Waktu</th>
+                                <th>Aksi<th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,6 +32,13 @@
                                     <span class="badge bg-danger" th:unless="${log.pingStatus}">OFFLINE</span>
                                 </td>
                                 <td class="ping-time" th:text="${#dates.format(log.monitoring, 'yyyy-MM-dd HH:mm:ss')}">2025-05-01 16:11:12</td>
+                                <td>
+                                    <button class="btn btn-sm recovery-btn"
+                                            th:classappend="${log.pingStatus} ? 'btn-secondary disabled' : 'btn-success'"
+                                            th:attr="data-ip=${log.device.ipAddress}">
+                                        <i class="fas fa-sync-alt"></i> Recovery
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
