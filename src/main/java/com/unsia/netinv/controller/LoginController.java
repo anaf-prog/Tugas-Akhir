@@ -19,10 +19,13 @@ public class LoginController {
     UserService userService;
 
     @GetMapping("/login")
-    public String showLoginForm(HttpSession session) {
+    public String showLoginForm(HttpSession session, Model model) {
         if (session.getAttribute("user") != null) {
             return "redirect:/dashboard";
         }
+
+        model.addAttribute("success", "Registrasi berhasil, Silahkan login");
+        
         return "login";
     }
 
