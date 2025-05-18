@@ -1,0 +1,7 @@
+.clickable-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.clickable-card:hover {
+    transform: translateY(-2px);
+}

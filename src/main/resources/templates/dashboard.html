@@ -20,6 +20,7 @@
     <link rel="stylesheet" th:href="@{/css/recovery.css}">
     <link rel="stylesheet" th:href="@{/css/web-socket.css}">
     <link rel="stylesheet" th:href="@{/css/paging.css}">
+    <link rel="stylesheet" th:href="@{/css/card-dashboard.css}">
 </head>
 <body>
 
@@ -54,6 +55,9 @@
 
             <!-- Modal Recovery -->
             <div th:insert="~{fragments/modal-recovery.html}"></div>
+
+            <!-- Modal Down Device -->
+            <div th:insert="~{fragments/modal-down-device.html}"></div>
 
             <!-- Topbar -->
             <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
@@ -120,6 +124,7 @@
     <script th:src="@{/js/notifikasi.js}"></script>
     <script th:src="@{/js/confirmDelete.js}"></script>
     <script th:src="@{/js/notifikasi-websocket.js}"></script>
+    <script th:src="@{/js/cardDashboard.js}"></script>
 
     
 </body>

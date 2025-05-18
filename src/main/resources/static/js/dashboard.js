@@ -62,6 +62,10 @@ $(document).ready(function () {
 
     // Fungsi untuk update status perangkat
     function updateDeviceStatus() {
+        if (typeof isDownDevicesModalOpen !== 'undefined' && isDownDevicesModalOpen) {
+            return;
+        }
+        
         $.get(window.location.href, function(data) {
             var newDoc = $(data);
 
@@ -80,13 +84,6 @@ $(document).ready(function () {
             $('.table-responsive:last table tbody').html(
                 newDoc.find('.table-responsive:last table tbody').html()
             );
-            
-            // Update counter
-            // $('.card-counter').each(function() {
-            //     var counterType = $(this).data('counter');
-            //     var newValue = newDoc.find('[data-counter="' + counterType + '"]').text();
-            //     $(this).text(newValue);
-            // });
         });
     }
     

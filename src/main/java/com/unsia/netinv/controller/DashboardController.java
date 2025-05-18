@@ -1,12 +1,16 @@
 package com.unsia.netinv.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,5 +81,33 @@ public class DashboardController {
 
         return "dashboard";
 
+    }
+
+    @GetMapping("/devices/down")
+    public ResponseEntity<List<Map<String, Object>>> getDownDevices() {
+        List<Device> downDevices = deviceRepository.findByStatusDevice("OFFLINE");
+        
+        // Convert ke format yang lebih mudah diproses di frontend
+        List<Map<String, Object>> response = downDevices.stream().map(device -> {
+            Map<String, Object> deviceMap = new LinkedHashMap<>();
+            deviceMap.put("device_name", device.getDeviceName());
+            deviceMap.put("ip_address", device.getIpAddress());
+            deviceMap.put("device_type", device.getDeviceType());
+            deviceMap.put("status_device", device.getStatusDevice());
+            deviceMap.put("last_checked", device.getLastChecked());
+            
+            // Tambahkan data lokasi
+            if (device.getLocation() != null) {
+                Map<String, Object> locationMap = new LinkedHashMap<>();
+                locationMap.put("location_name", device.getLocation().getLocationName());
+                locationMap.put("room", device.getLocation().getRoom());
+                locationMap.put("floor", device.getLocation().getFloor());
+                deviceMap.put("location", locationMap);
+            }
+            
+            return deviceMap;
+        }).collect(Collectors.toList());
+        
+        return ResponseEntity.ok(response);
     }
 }

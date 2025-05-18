@@ -1,0 +1,35 @@
+<!-- File: fragments/modal-down-device.html -->
+<div class="modal fade" id="downDevicesModal" tabindex="-1" aria-labelledby="downDevicesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="downDevicesModalLabel">Daftar Perangkat Down</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nama Perangkat</th>
+                                <th>Alamat IP</th>
+                                <th>Tipe</th>
+                                <th>Lokasi</th>
+                                <th>Ruangan</th>
+                                <th>Lantai</th>
+                                <th>Status</th>
+                                <th>Terakhir Dicheck</th>
+                            </tr>
+                        </thead>
+                        <tbody id="downDevicesList">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
