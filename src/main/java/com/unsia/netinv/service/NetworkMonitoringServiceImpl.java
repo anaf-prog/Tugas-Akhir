@@ -35,6 +35,9 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     private EmailNotificationService emailNotificationService;
 
     @Autowired
+    private DashboardNotificationService dashboardNotificationService;
+
+    @Autowired
     private PingService pingService;
 
     @Autowired
@@ -66,9 +69,12 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
                         try {
                             failoverService.activateBackupRoute(device.getId());
                             emailNotificationService.sendDeviceDownNotification(device,"Sistem telah melakukan failover otomatis ke perangkat cadangan");
+                            dashboardNotificationService.sendDeviceDownNotification(device, "Perangkat down! Sistem melakukan failover otomatis");
                         } catch (Exception e) {
                             System.out.println("Gagal failover untuk perangkat " + device.getDeviceName() + e.getMessage());
-                        }
+                        } 
+                    } else {
+                        dashboardNotificationService.sendDeviceRecoveredNotification(device, "Perangkat kembali online");
                     }
                 } else if (isAnomaly) {
                     createNewLog(device, isOnline, responseTime, LogReason.HIGH_LATENCY);

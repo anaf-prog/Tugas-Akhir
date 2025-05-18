@@ -1,0 +1,19 @@
+.notification-container {
+    position: fixed;
+    right: 1rem;
+    top: 5rem; /* Sesuaikan dengan tinggi navbar */
+    width: 350px;
+    z-index: 1100;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+}
+
+.notification-item {
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

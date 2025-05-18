@@ -18,6 +18,7 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
     <link rel="stylesheet" th:href="@{/css/modal-recovery.css}">
     <link rel="stylesheet" th:href="@{/css/recovery.css}">
+    <link rel="stylesheet" th:href="@{/css/web-socket.css}">
 </head>
 <body>
 
@@ -78,6 +79,12 @@
                     <span th:text="${errorMessage}"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+
+                <!-- Notifikasi real-time -->
+                <div id="realTimeNotifications" class="notification-container">
+                    <!-- Notifikasi akan muncul di sini -->
+                </div>
+
             </div>
 
             <!-- ========== Dashboard Content ========== -->
@@ -101,11 +108,18 @@
     <!-- Bootstrap & jQuery JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Web Socket Library-->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script> 
     
     <!-- Custom JS -->
     <script th:src="@{/js/dashboard.js}"></script>
     <script th:src="@{/js/recovery.js}"></script>
     <script th:src="@{/js/notifikasi.js}"></script>
     <script th:src="@{/js/confirmDelete.js}"></script>
+    <script th:src="@{/js/notifikasi-websocket.js}"></script>
+
+    
 </body>
 </html>
