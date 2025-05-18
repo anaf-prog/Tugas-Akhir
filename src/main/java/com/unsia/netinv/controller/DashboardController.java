@@ -56,6 +56,10 @@ public class DashboardController {
         long activeDevices = deviceRepository.countByStatusDevice("ONLINE");
         long downDevices = deviceRepository.countByStatusDevice("OFFLINE");
 
+        long routerCount = deviceRepository.countByDeviceType("ROUTER");
+        long switchCount = deviceRepository.countByDeviceType("SWITCH");
+        long serverCount = deviceRepository.countByDeviceType("SERVER");
+
         Pageable devicPageable = PageRequest.of(devicePage, deviceSize, Sort.by("deviceName").ascending());
         Page<Device> devicePageResult = deviceRepository.findAll(devicPageable);
 
@@ -68,6 +72,10 @@ public class DashboardController {
         model.addAttribute("totalDevices", totalDevices);
         model.addAttribute("activeDevices", activeDevices);
         model.addAttribute("downDevices", downDevices);
+
+        model.addAttribute("routerCount", routerCount);
+        model.addAttribute("switchCount", switchCount);
+        model.addAttribute("serverCount", serverCount);
 
         model.addAttribute("devices", devicePageResult.getContent());
         model.addAttribute("deviceCurrentPage", devicePage);

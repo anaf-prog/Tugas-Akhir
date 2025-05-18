@@ -1,3 +1,73 @@
+// Pindahkan inisialisasi chart ke fungsi terpisah
+function initializeCharts() {
+    // Pie Chart (Jenis Perangkat)
+    const deviceTypeCtx = document.getElementById('deviceTypeChart');
+    if (deviceTypeCtx) {
+        const deviceTypeData = document.getElementById('deviceTypeData');
+        const routerCount = parseInt(deviceTypeData?.dataset?.routerCount) || 0;
+        const switchCount = parseInt(deviceTypeData?.dataset?.switchCount) || 0;
+        const serverCount = parseInt(deviceTypeData?.dataset?.serverCount) || 0;
+
+        new Chart(deviceTypeCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Router', 'Switch', 'Server'],
+                datasets: [{
+                    data: [routerCount, switchCount, serverCount],
+                    backgroundColor: [
+                        '#4e73df',
+                        '#1cc88a',
+                        '#36b9cc'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                responsive: true, // Tambahkan ini
+                maintainAspectRatio: false, // Tambahkan ini
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Line Chart (Status Perangkat)
+    const statusCtx = document.getElementById('deviceStatusChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'line',
+            data: {
+                labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                datasets: [{
+                    label: 'Perangkat Aktif',
+                    data: [15, 18, 16, 17, 15, 19, 20],
+                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                    borderColor: '#4e73df',
+                    tension: 0.3
+                }, {
+                    label: 'Perangkat Down',
+                    data: [2, 1, 3, 0, 1, 2, 0],
+                    backgroundColor: 'rgba(231, 74, 59, 0.05)',
+                    borderColor: '#e74a3b',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+}
+
 // Sidebar toggle
 $(document).ready(function () {
     $('#sidebarCollapse').on('click', function () {
@@ -5,60 +75,8 @@ $(document).ready(function () {
         $('#content').toggleClass('active');
     });
 
-    // Pie Chart (Jenis Perangkat)
-    const deviceTypeCtx = document.getElementById('deviceTypeChart').getContext('2d');
-    const deviceTypeChart = new Chart(deviceTypeCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Router', 'Switch', 'Access Point', 'Lainnya'],
-            datasets: [{
-                data: [12, 19, 8, 3],
-                backgroundColor: [
-                    '#4e73df',
-                    '#1cc88a',
-                    '#36b9cc',
-                    '#f6c23e'
-                ],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-
-    // Line Chart (Status Perangkat)
-    const statusCtx = document.getElementById('deviceStatusChart').getContext('2d');
-    const statusChart = new Chart(statusCtx, {
-        type: 'line',
-        data: {
-            labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
-            datasets: [{
-                label: 'Perangkat Aktif',
-                data: [15, 18, 16, 17, 15, 19, 20],
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                borderColor: '#4e73df',
-                tension: 0.3
-            }, {
-                label: 'Perangkat Down',
-                data: [2, 1, 3, 0, 1, 2, 0],
-                backgroundColor: 'rgba(231, 74, 59, 0.05)',
-                borderColor: '#e74a3b',
-                tension: 0.3
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+    // Inisialisasi chart
+    initializeCharts();
 
     // Fungsi untuk update status perangkat
     function updateDeviceStatus() {

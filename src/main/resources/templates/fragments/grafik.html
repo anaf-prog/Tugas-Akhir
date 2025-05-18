@@ -7,6 +7,13 @@
             </div>
             <div class="card-body">
                 <canvas id="deviceTypeChart" height="250"></canvas>
+                <!-- Data dari controller - PERBAIKAN DISINI -->
+                <div id="deviceTypeData" 
+                    th:attr="
+                    data-router-count=${routerCount},
+                    data-switch-count=${switchCount},
+                    data-server-count=${serverCount}">
+                </div>
             </div>
         </div>
     </div>

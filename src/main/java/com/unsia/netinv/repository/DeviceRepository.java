@@ -20,5 +20,7 @@ public interface DeviceRepository extends JpaRepository<Device, Long>, JpaSpecif
     boolean existsByIpAddress(String ipAddress);
 
     Device findByIpAddress(String ipAddress);
+
+    long countByDeviceType(String deviceType);
     
 }
