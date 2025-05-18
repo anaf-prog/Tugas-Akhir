@@ -33,18 +33,18 @@ public class SimulationServiceImpl implements SimulationService {
     @Autowired
     private MonitoringLogRepository monitoringLogRepository;
 
-    @PostConstruct
-    @Override
-    public void init() {
-        scheduleFailure("192.168.1.9", 1);
-    }
+    // @PostConstruct
+    // @Override
+    // public void init() {
+    //     scheduleFailure("192.168.1.9", 1);
+    // }
 
-    @Override
-    public void scheduleFailure(String ipAddress, int minutesToFailure) {
-        LocalDateTime failureTime = LocalDateTime.now().plusMinutes(minutesToFailure);
-        failureSchedule.put(ipAddress, failureTime);
-        System.out.println("Failure scheduled for " + ipAddress + " at " + failureTime);
-    }
+    // @Override
+    // public void scheduleFailure(String ipAddress, int minutesToFailure) {
+    //     LocalDateTime failureTime = LocalDateTime.now().plusMinutes(minutesToFailure);
+    //     failureSchedule.put(ipAddress, failureTime);
+    //     System.out.println("Failure scheduled for " + ipAddress + " at " + failureTime);
+    // }
 
     @Override
     public void cancelScheduleFailure(String ipAddress) {
@@ -86,23 +86,23 @@ public class SimulationServiceImpl implements SimulationService {
         System.out.println("All device recovered");
     }
 
-    @Scheduled(fixedRate = 6000)
-    @Override
-    public void checkScheduleFailures() {
-        LocalDateTime now = LocalDateTime.now();
+    // @Scheduled(fixedRate = 6000)
+    // @Override
+    // public void checkScheduleFailures() {
+    //     LocalDateTime now = LocalDateTime.now();
 
-        for (Map.Entry<String, LocalDateTime> entry : failureSchedule.entrySet()) {
-            String ipAddress = entry.getKey();
-            LocalDateTime failureTime = entry.getValue();
+    //     for (Map.Entry<String, LocalDateTime> entry : failureSchedule.entrySet()) {
+    //         String ipAddress = entry.getKey();
+    //         LocalDateTime failureTime = entry.getValue();
 
-            if (now.isAfter(failureTime)) {
-                pingService.forceFailure(ipAddress, true);
-                currentlyFailedDevice.add(ipAddress);
-                failureSchedule.remove(ipAddress);
-                System.out.println("Simulasi failure aktif : " + ipAddress);
-            }
-        }
-    }
+    //         if (now.isAfter(failureTime)) {
+    //             pingService.forceFailure(ipAddress, true);
+    //             currentlyFailedDevice.add(ipAddress);
+    //             failureSchedule.remove(ipAddress);
+    //             System.out.println("Simulasi failure aktif : " + ipAddress);
+    //         }
+    //     }
+    // }
 
     @Override
     public Set<String> getFaileddevices() {

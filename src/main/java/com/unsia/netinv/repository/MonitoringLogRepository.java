@@ -3,6 +3,7 @@ package com.unsia.netinv.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -45,5 +46,25 @@ public interface MonitoringLogRepository extends JpaRepository<MonitoringLog, Lo
     Optional<MonitoringLog> findTopByDeviceOrderByMonitoringDesc(Device device);
 
     List<MonitoringLog> findByDevice(Device device, Pageable pageable);
+
+    Page<MonitoringLog> findByDeviceIn(List<Device> devices, Pageable pageable);
+
+    // @Query(value = "SELECT m.* FROM monitoring_logs m " +
+    //            "INNER JOIN (SELECT device_id, MAX(monitoring) AS max_monitoring " +
+    //                        "FROM monitoring_logs GROUP BY device_id) latest " +
+    //            "ON m.device_id = latest.device_id AND m.monitoring = latest.max_monitoring " +
+    //            "ORDER BY m.monitoring DESC",
+    //    nativeQuery = true)
+    // List<MonitoringLog> findLatestLogPerDevice(Pageable pageable);
+
+    @Query(value = "SELECT m.* FROM monitoring_logs m " +
+               "INNER JOIN (SELECT device_id, MAX(monitoring) AS max_monitoring " +
+                           "FROM monitoring_logs GROUP BY device_id) latest " +
+               "ON m.device_id = latest.device_id AND m.monitoring = latest.max_monitoring " +
+               "ORDER BY m.monitoring DESC",
+       nativeQuery = true)
+    Page<MonitoringLog> findLatestLogPerDevice(Pageable pageable);
+
+
     
 }

@@ -3,9 +3,9 @@ package com.unsia.netinv.service;
 import java.util.Set;
 
 public interface SimulationService {
-    void init();
+    // void init();
 
-    void scheduleFailure(String ipAddress, int minutesToFailure);
+    // void scheduleFailure(String ipAddress, int minutesToFailure);
 
     void cancelScheduleFailure(String ipAddress);
 
@@ -13,7 +13,7 @@ public interface SimulationService {
 
     void recoveryAllDevices();
 
-    void checkScheduleFailures();
+    // void checkScheduleFailures();
 
     Set<String> getFaileddevices();
 }

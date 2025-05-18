@@ -27,13 +27,13 @@ public class FailoverController {
     @Autowired
     private DeviceRepository deviceRepository;
 
-    @PostMapping("/schedule-failure")
-    public String scheduleFailure(@RequestParam String ipAddress,
-                                  @RequestParam int minutesToFailure) {
+    // @PostMapping("/schedule-failure")
+    // public String scheduleFailure(@RequestParam String ipAddress,
+    //                               @RequestParam int minutesToFailure) {
 
-        simulation.scheduleFailure(ipAddress, minutesToFailure);
-        return "Failure scheduled for " + ipAddress + " in " + minutesToFailure + " minutes";
-    }
+    //     simulation.scheduleFailure(ipAddress, minutesToFailure);
+    //     return "Failure scheduled for " + ipAddress + " in " + minutesToFailure + " minutes";
+    // }
 
     @PostMapping("/recover")
     public ResponseEntity<Map<String, Object>> recoverydevice(@RequestParam String ipAddress) {
