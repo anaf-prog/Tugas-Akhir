@@ -2,7 +2,12 @@ package com.unsia.netinv.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -84,4 +89,23 @@ public class Device {
 
     @OneToMany(mappedBy = "backupDevice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FailOverLogs> backuoFailoverLogs = new ArrayList<>();
+
+    public String toJson() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", id);
+            map.put("deviceName", deviceName);
+            map.put("ipAddress", ipAddress);
+            map.put("macAddress", macAddress);
+            map.put("deviceType", deviceType);
+            map.put("statusDevice", statusDevice);
+            map.put("lastChecked", lastChecked != null ? lastChecked.toString() : "N/A");
+
+            return mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            System.out.println("Error parsing di entity device : " + e.getMessage());
+            return "{}";
+        }
+    }
 }

@@ -1,0 +1,58 @@
+/* Card Styles */
+.device-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.device-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.device-card .card-body {
+    padding: 1.5rem;
+}
+
+.device-card .network-animation {
+    height: 120px;
+    width: 100%;
+    background-color: #f8f9fa;
+    position: relative;
+    overflow: hidden;
+}
+
+.device-card .device-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+/* Modal Styles */
+.device-detail .detail-row {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.device-detail .detail-label {
+    font-weight: 600;
+    color: #555;
+}
+
+/* Status Badges */
+.badge-online {
+    background-color: #28a745;
+}
+
+.badge-offline {
+    background-color: #dc3545;
+}
+
+/* Layout */
+.card-container {
+    padding: 20px;
+}
