@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.unsia.netinv.entity.Device;
@@ -29,19 +30,25 @@ public class DashboardServiceImpl implements DashboardService {
     private MonitoringLogRepository monitoringLogRepository;
 
     @Override
-    public Map<String, Object> getDashboardData(int devicePage, int deviceSize, int logPage, int logSize, Users user) {
+    public Map<String, Object> getDashboardData(int devicePage, int deviceSize, int logPage, int logSize, String search, String status, String type, Users user) {
         Map<String, Object> data = new HashMap<>();
 
-        long totalDevices = deviceRepository.count();
-        long activeDevices = deviceRepository.countByStatusDevice("ONLINE");
-        long downDevices = deviceRepository.countByStatusDevice("OFFLINE");
+        Specification<Device> countSpec = new DeviceSpecification(search, status, type);
 
-        long routerCount = deviceRepository.countByDeviceType("ROUTER");
-        long switchCount = deviceRepository.countByDeviceType("SWITCH");
-        long serverCount = deviceRepository.countByDeviceType("SERVER");
+        long totalDevices = deviceRepository.count(countSpec);
+        long activeDevices = deviceRepository.count(countSpec.and((root, query, cb) -> cb.equal(root.get("statusDevice"), "ONLINE")));
+        long downDevices = deviceRepository.count(countSpec.and((root, query, cb) -> cb.equal(root.get("statusDevice"), "OFFLINE")));
 
-        Pageable devicPageable = PageRequest.of(devicePage, deviceSize, Sort.by("deviceName").ascending());
-        Page<Device> devicePageResult = deviceRepository.findAll(devicPageable);
+        Specification<Device> routerSpec = countSpec.and((root, query, cb) -> cb.equal(root.get("deviceType"), "ROUTER"));
+        Specification<Device> switchSpec = countSpec.and((root, query, cb) -> cb.equal(root.get("deviceType"), "SWITCH"));
+        Specification<Device> serverSpec = countSpec.and((root, query, cb) -> cb.equal(root.get("deviceType"), "SERVER"));
+
+        long routerCount = deviceRepository.count(routerSpec);
+        long switchCount = deviceRepository.count(switchSpec);
+        long serverCount = deviceRepository.count(serverSpec);
+
+        Pageable devicePageable = PageRequest.of(devicePage, deviceSize, Sort.by("deviceName").ascending());
+        Page<Device> devicePageResult = deviceRepository.findAll(new DeviceSpecification(search, status, type), devicePageable);
 
         Pageable logPageable = PageRequest.of(logPage, logSize, Sort.by("monitoring").descending());
         Page<MonitoringLog> logPageResult = monitoringLogRepository.findLatestLogPerDevice(logPageable);

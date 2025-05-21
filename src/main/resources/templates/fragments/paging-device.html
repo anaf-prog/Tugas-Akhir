@@ -1,48 +1,32 @@
 <!-- Pagination -->
 <div th:if="${deviceTotalPages > 1}">
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <!-- First Page -->
+    <nav>
+        <ul class="pagination pagination-sm mb-0 justify-content-center">
             <li class="page-item" th:classappend="${deviceCurrentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/dashboard(devicePage=0,deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, logPage=${logCurrentPage}, logSize=${param.logSize != null ? param.logSize : 5})}">
-                    <span>&laquo;&laquo;</span>
+                <a class="page-link" th:href="@{'/dashboard'(devicePage=0, deviceSize=${deviceSize}, search=${searchParam}, status=${statusParam}, type=${typeParam})}">
+                    &laquo;
                 </a>
             </li>
-            
-            <!-- Previous Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/dashboard(devicePage=${deviceCurrentPage - 1},deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, logPage=${logCurrentPage}, logSize=${param.logSize != null ? param.logSize : 5})}">
-                    <span>&laquo;</span>
+                <a class="page-link" th:href="@{'/dashboard'(devicePage=${deviceCurrentPage - 1}, deviceSize=${deviceSize}, search=${searchParam}, status=${statusParam}, type=${typeParam})}">
+                    &lsaquo;
                 </a>
             </li>
-            
-            <!-- Page Numbers -->
-            <li th:each="i : ${#numbers.sequence(
-                (deviceCurrentPage < 5) ? 0 : (deviceCurrentPage > deviceTotalPages - 5) ? (deviceTotalPages - 9) : (deviceCurrentPage - 4),
-                ((deviceCurrentPage < 5) ? (deviceTotalPages > 9 ? 9 : deviceTotalPages - 1) : 
-                (deviceCurrentPage > deviceTotalPages - 5) ? (deviceTotalPages - 1) : (deviceCurrentPage + 5))
-            )}" 
-            th:if="${i >= 0 && i < deviceTotalPages}"
-            class="page-item" th:classappend="${i == deviceCurrentPage} ? 'active'">
-                <a class="page-link" 
-                   th:href="@{/dashboard(devicePage=${i},deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, logPage=${logCurrentPage}, logSize=${param.logSize != null ? param.logSize : 5})}" 
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, deviceTotalPages - 1)}" 
+                th:classappend="${i == deviceCurrentPage} ? 'active'">
+                <a class="page-link" th:href="@{'/dashboard'(devicePage=${i}, deviceSize=${deviceSize}, search=${searchParam}, status=${statusParam}, type=${typeParam})}"
                    th:text="${i + 1}">1</a>
             </li>
-            
-            <!-- Next Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == deviceTotalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/dashboard(devicePage=${deviceCurrentPage + 1},deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, logPage=${logCurrentPage}, logSize=${param.logSize != null ? param.logSize : 5})}">
-                    <span>&raquo;</span>
+                <a class="page-link" th:href="@{'/dashboard'(devicePage=${deviceCurrentPage + 1}, deviceSize=${deviceSize}, search=${searchParam}, status=${statusParam}, type=${typeParam})}">
+                    &rsaquo;
                 </a>
             </li>
-            
-            <!-- Last Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == deviceTotalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/dashboard(devicePage=${deviceTotalPages - 1},deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, logPage=${logCurrentPage}, logSize=${param.logSize != null ? param.logSize : 5})}">
-                    <span>&raquo;&raquo;</span>
+                <a class="page-link" th:href="@{'/dashboard'(devicePage=${deviceTotalPages - 1}, deviceSize=${deviceSize}, search=${searchParam}, status=${statusParam}, type=${typeParam})}">
+                    &raquo;
                 </a>
             </li>
         </ul>
     </nav>
-    
 </div>
