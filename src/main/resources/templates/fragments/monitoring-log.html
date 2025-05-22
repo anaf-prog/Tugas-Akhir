@@ -11,8 +11,8 @@
             <br>
             <div class="row mb-3 g-2">
                 <div class="col-md-5">
-                    <label for="deviceFilter" class="form-label">Filter Perangkat</label>
-                    <select id="deviceFilter" class="form-select">
+                    <label for="deviceFilterLog" class="form-label">Filter Perangkat</label>
+                    <select id="deviceFilterLog" class="form-select">
                         <option value="">Semua Perangkat</option>
                         <option th:each="device : ${devices}" 
                                 th:value="${device.deviceName}"

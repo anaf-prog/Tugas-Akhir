@@ -35,7 +35,7 @@ $(document).ready(function() {
     });
 
     // Filter berdasarkan nama perangkat
-    $('#deviceFilter').on('change', function() {
+    $('#deviceFilterLog').on('change', function() {
         var deviceName = $(this).val();
         if (deviceName) {
             table.column(0).search('^' + deviceName + '$', true, false).draw();
@@ -57,7 +57,7 @@ $(document).ready(function() {
 
     // Tombol reset
     $('#resetFilter').on('click', function() {
-        $('#deviceFilter').val('');
+        $('#deviceFilterLog').val('');
         $('#dateFilter').val('');
         table.search('').columns().search('').draw();
     });
