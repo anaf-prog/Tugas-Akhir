@@ -35,6 +35,7 @@
                 <table id="monitoringLogsTable" class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th class="d-none">Device Name Only</th>
                             <th>No.</th>
                             <th>Perangkat</th>
                             <th>Status Ping</th>
@@ -45,6 +46,7 @@
                     </thead>
                     <tbody>
                         <tr th:each="log, iterStat : ${monitoringLogs}">
+                            <td th:text="${log.device.deviceName}" class="d-none device-name-column">DeviceNameOnly</td>
                             <td th:text="${iterStat.count}">1</td>
                             <td>
                                 <span th:text="${log.device.deviceName}">Nama Perangkat</span>

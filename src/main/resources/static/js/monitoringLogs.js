@@ -15,9 +15,10 @@ $(document).ready(function() {
             }
         },
         "pageLength": 10,
-        "order": [[4, "desc"]],
+        "order": [[5, "desc"]],
         "columnDefs": [
-            { "orderable": false, "targets": [0, 5] }
+            { "targets": [0], "visible": false },
+            { "orderable": false, "targets": [1, 6] }
         ],
         "dom": '<"top"<"row"<"col-md-6"l><"col-md-6"f>>>' +
                'rt' +
@@ -36,7 +37,11 @@ $(document).ready(function() {
     // Filter berdasarkan nama perangkat
     $('#deviceFilter').on('change', function() {
         var deviceName = $(this).val();
-        table.column(1).search(deviceName, false, false).draw();
+        if (deviceName) {
+            table.column(0).search('^' + deviceName + '$', true, false).draw();
+        } else {
+            table.column(0).search('').draw();
+        }
     });
 
     // Filter berdasarkan tanggal (versi lebih akurat)
