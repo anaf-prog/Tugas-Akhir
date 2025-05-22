@@ -16,4 +16,178 @@
 /* Modal Styles */
 .modal-lg {
     max-width: 800px;
+}  
+
+/* Style untuk form filter */
+/* Sembunyikan search box bawaan DataTables */
+.dataTables_filter {
+    display: none !important;
+}
+
+/* Style untuk form filter custom */
+#deviceFilter, #dateFilter {
+    margin-bottom: 15px;
+    max-width: 100%;
+}
+
+/* Style untuk select */
+.form-select {
+    cursor: pointer;
+}
+
+/* Responsive form filter */
+@media (max-width: 768px) {
+    .row.mb-3 > div {
+        margin-bottom: 10px;
+    }
+}
+
+/* Style untuk tombol reset */
+#resetFilter {
+    height: 38px;
+    white-space: nowrap;
+    margin-bottom: 15px;
+}
+
+#resetFilter:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+/* Ganti ini */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Dengan ini */
+.table-container {
+  width: 100%;
+  overflow: hidden; /* Pastikan tidak ada overflow */
+}
+
+#monitoringLogsTable {
+  width: 100%;
+  min-width: 100%;
+  table-layout: fixed; /* Ubah dari auto ke fixed */
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#monitoringLogsTable th,
+#monitoringLogsTable td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.5rem 0.75rem; /* Kurangi padding */
+}
+
+/* Atur lebar kolom */
+#monitoringLogsTable th:nth-child(1),
+#monitoringLogsTable td:nth-child(1) {
+  width: 5%;
+}
+
+#monitoringLogsTable th:nth-child(2),
+#monitoringLogsTable td:nth-child(2) {
+  width: 20%;
+}
+
+#monitoringLogsTable th:nth-child(3),
+#monitoringLogsTable td:nth-child(3) {
+  width: 10%;
+}
+
+#monitoringLogsTable th:nth-child(4),
+#monitoringLogsTable td:nth-child(4) {
+  width: 15%;
+}
+
+#monitoringLogsTable th:nth-child(5),
+#monitoringLogsTable td:nth-child(5) {
+  width: 25%;
+}
+
+#monitoringLogsTable th:nth-child(6),
+#monitoringLogsTable td:nth-child(6) {
+  width: 15%;
+}
+
+/* Perbaiki card styling */
+.card {
+  border-radius: 0.5rem;
+}
+
+/* Media query untuk mobile */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .card {
+    border-radius: 0;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  #monitoringLogsTable {
+    table-layout: auto;
+  }
+  
+  #monitoringLogsTable th,
+  #monitoringLogsTable td {
+    white-space: normal;
+    padding: 0.5rem;
+  }
+}
+
+/* paging */
+/* Style untuk pagination DataTables */
+.dataTables_wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dataTables_paginate {
+  justify-content: center !important;
+  display: flex !important;  
+  margin-top: 1.5rem !important; /* Tambahkan margin atas */
+  padding-top: 1rem !important; /* Tambahkan padding atas */
+  border-top: 1px solid #dee2e6; /* Garis pemisah opsional */
+}
+
+/* Tambahkan margin bawah untuk card-body */
+.card-body {
+  padding-bottom: 2rem !important;
+}
+
+/* Style untuk pagination button */
+.paginate_button {
+  margin: 0 3px !important;
+}
+
+/* Pastikan wrapper pagination mengambil space penuh */
+.dataTables_wrapper .bottom {
+  width: 100%;
+  margin-top: auto; /* Ini akan mendorong pagination ke bawah */
+}
+
+/* Tambahkan di CSS Anda */
+.badge.bg-primary {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+.badge.bg-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: white !important;
 }

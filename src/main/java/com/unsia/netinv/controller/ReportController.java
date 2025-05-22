@@ -1,5 +1,7 @@
 package com.unsia.netinv.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +23,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.unsia.netinv.dto.ReportEdit;
 import com.unsia.netinv.dto.ReportForm;
 import com.unsia.netinv.entity.Device;
+import com.unsia.netinv.entity.MonitoringLog;
 import com.unsia.netinv.entity.Report;
 import com.unsia.netinv.entity.Users;
 import com.unsia.netinv.netinve.ReportStatus;
 import com.unsia.netinv.repository.DeviceRepository;
+import com.unsia.netinv.repository.MonitoringLogRepository;
 import com.unsia.netinv.repository.ReportRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -35,10 +39,13 @@ import jakarta.validation.Valid;
 public class ReportController {
     
     @Autowired
-    DeviceRepository deviceRepository;
+    private DeviceRepository deviceRepository;
 
     @Autowired
-    ReportRepository reportRepository;
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private MonitoringLogRepository monitoringLogRepository;
 
     @PostMapping
     public String createReport(@RequestBody @Valid ReportForm reportForm,
@@ -73,6 +80,12 @@ public class ReportController {
         }
     }
 
+    public static String formatDate(Date date) {
+        if (date == null) return "-";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return sdf.format(date);
+    }
+
     @GetMapping
     public String listReports(Model model, HttpSession session) {
 
@@ -83,11 +96,21 @@ public class ReportController {
 
         List<Report> reports = reportRepository.findAll();
         List<Device> devices = deviceRepository.findAll();
+        List<MonitoringLog> monitoringLogs = monitoringLogRepository.findAllByOrderByMonitoringDesc();
+
+        model.addAttribute("formatDate", new Object() {
+            @SuppressWarnings("unused")
+            public String apply(Date date) {
+                return formatDate(date);
+            }
+        });
 
         model.addAttribute("currentUser", user.getUsername());
         model.addAttribute("userRole", user.getRole());
         model.addAttribute("reports", reports);
         model.addAttribute("devices", devices);
+        model.addAttribute("monitoringLogs", monitoringLogs);
+
         return "reports";
     }
 

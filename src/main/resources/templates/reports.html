@@ -57,61 +57,8 @@
             <div th:insert="~{fragments/modal-confirm-report.html}"></div>
             
             <!-- Modal Buat Laporan -->
-            <div class="modal fade" id="createReportModal" tabindex="-1" aria-labelledby="createReportModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="createReportModalLabel">Buat Laporan Perbaikan</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form th:action="@{/reports}" method="post" id="reportForm">
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="deviceId" class="form-label">Perangkat</label>
-                                    <select class="form-select" id="deviceId" name="deviceId" required>
-                                        <option value="">Pilih Perangkat</option>
-                                        <option th:each="device : ${devices}" 
-                                                th:value="${device.id}"
-                                                th:text="${device.deviceName + ' (' + device.ipAddress + ')'}"></option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="issueDate" class="form-label">Tanggal Masalah</label>
-                                    <input type="datetime-local" class="form-control" id="issueDate" name="issueDate" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="issueDescription" class="form-label">Deskripsi Masalah</label>
-                                    <textarea class="form-control" id="issueDescription" name="issueDescription" rows="3" required></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="repairDate" class="form-label">Tanggal Perbaikan</label>
-                                    <input type="datetime-local" class="form-control" id="repairDate" name="repairDate" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="repairDescription" class="form-label">Tindakan Perbaikan</label>
-                                    <textarea class="form-control" id="repairDescription" name="repairDescription" rows="3" required></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="technician" class="form-label">Teknisi</label>
-                                    <input type="text" class="form-control" id="technician" name="technician" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select class="form-select" id="status" name="status" required>
-                                        <option value="SELESAI">Selesai</option>
-                                        <option value="DALAM_PERBAIKAN">Dalam Perbaikan</option>
-                                        <option value="DITUNDA">Ditunda</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Simpan Laporan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <div th:insert="~{fragments/modal-laporan-report.html}"></div> 
+            
 
             <!-- Topbar -->
             <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
@@ -197,6 +144,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ========== Tabel Monitoring Log ========== -->
+            <div th:insert="~{fragments/monitoring-log.html}"></div> 
+           
+
         </div>
     </div>
 
@@ -214,5 +166,6 @@
     <script th:src="@{/js/reports.js}"></script>
     <script th:src="@{/js/modalDeleteReport.js}"></script>
     <script th:src="@{/js/notifikasiReport.js}"></script>
+    <script th:src="@{/js/monitoringLogs.js}"></script>
 </body>
 </html>

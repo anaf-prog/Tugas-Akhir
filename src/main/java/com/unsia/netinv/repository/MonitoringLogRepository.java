@@ -65,6 +65,8 @@ public interface MonitoringLogRepository extends JpaRepository<MonitoringLog, Lo
        nativeQuery = true)
     Page<MonitoringLog> findLatestLogPerDevice(Pageable pageable);
 
+    List<MonitoringLog> findAllByOrderByMonitoringDesc();
+
 
     
 }
