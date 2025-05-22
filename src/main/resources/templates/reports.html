@@ -96,16 +96,50 @@
                         </button>
                     </div>
                     <div class="card-body">
+
+                        <!-- Filter --> 
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="deviceFilter" class="form-label">Perangkat</label>
+                                <select id="deviceFilter" class="form-select">
+                                    <option value="">Semua Perangkat</option>
+                                    <option th:each="device : ${devices}" th:value="${device.deviceName}" th:text="${device.deviceName}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="technicianFilter" class="form-label">Teknisi</label>
+                                <input type="text" id="technicianFilter" class="form-control" placeholder="Semua Teknisi">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="startDateFilter" class="form-label">Dari Tanggal</label>
+                                <input type="text" id="startDateFilter" class="form-control datepicker" placeholder="Pilih tanggal">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="endDateFilter" class="form-label">Sampai Tanggal</label>
+                                <input type="text" id="endDateFilter" class="form-control datepicker" placeholder="Pilih tanggal">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12 text-end">
+                                <button id="resetFilterLaporan" class="btn btn-secondary me-2">
+                                    <i class="fas fa-undo me-1"></i> Reset
+                                </button>
+                                <button id="applyFilter" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table id="reportsTable" class="table table-hover">
                                 <thead class="table-light">
                                     <tr>
                                         <th>No.</th>
                                         <th>Perangkat</th>
-                                        <th>Tanggal Masalah</th>
+                                        <th>Tanggal Perbaikan</th>
                                         <th>Status</th>
                                         <th>Teknisi</th>
-                                        <th>Tanggal Perbaikan</th>
+                                        <th>Tanggal Selesai Perbaikan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -163,9 +197,14 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     
     <!-- Custom JS -->
-    <script th:src="@{/js/reports.js}"></script>
     <script th:src="@{/js/modalDeleteReport.js}"></script>
     <script th:src="@{/js/notifikasiReport.js}"></script>
     <script th:src="@{/js/monitoringLogs.js}"></script>
+
+    <script th:src="@{/js/reportDataTable.js}"></script>
+    <script th:src="@{/js/reportDatePicker.js}"></script>
+    <script th:src="@{/js/reportFormValidation.js}"></script>
+    <script th:src="@{/js/reportFilter.js}"></script>
+    <script th:src="@{/js/reports.js}"></script>
 </body>
 </html>

@@ -97,7 +97,14 @@
                                     </tr>
                                     <tr>
                                         <th>Lokasi</th>
-                                        <td th:text="${report.device.location}"></td>
+                                        <td>
+                                            <span th:if="${report.device.location != null}">
+                                                <span th:text="${report.device.location.floor}"></span>, 
+                                                <span th:text="${report.device.location.room}"></span> - 
+                                                <span th:text="${report.device.location.locationName}"></span>
+                                            </span>
+                                            <span th:if="${report.device.location == null}">-</span>
+                                        </td>
                                     </tr>
                                 </table>
                             </div>
