@@ -1,0 +1,114 @@
+/* Sidebar styling */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+/* Table styling */
+#maintenanceTable {
+    width: 100% !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+}
+
+/* Modal styling */
+.modal-header {
+    padding: 1rem 1.5rem;
+}
+
+/* Button spacing */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Custom Pagination */
+.dataTables_wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dataTables_paginate {
+  justify-content: center !important;
+  display: flex !important;  
+  margin-top: 1.5rem !important; /* Tambahkan margin atas */
+  padding-top: 1rem !important; /* Tambahkan padding atas */
+  border-top: 1px solid #dee2e6; /* Garis pemisah opsional */
+}
+
+.paginate_button {
+  margin: 0 3px !important;
+}
+
+/* Pastikan wrapper pagination mengambil space penuh */
+.dataTables_wrapper .bottom {
+  width: 100%;
+  margin-top: auto; /* Ini akan mendorong pagination ke bawah */
+}
+
+/* Alert Notification Styles */
+.alert {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1100;
+    min-width: 300px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert .btn-close {
+    padding: 0.5rem;
+}
+
+/* Delete Confirmation Modal Styles */
+#deleteConfirmationModal .modal-header {
+    background-color: #dc3545;
+}
+
+#deleteConfirmationModal .modal-body {
+    font-size: 1.1rem;
+}
+
+#confirmDeleteBtn {
+    min-width: 100px;
+}
+

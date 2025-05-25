@@ -1,6 +1,6 @@
 package com.unsia.netinv.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +25,7 @@ public class MaintenanceLog {
 
     @Column(name = "maintenance_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date maintenanceDate;
+    private LocalDateTime maintenanceDate;
 
     @Column(name = "descriptions")
     private String description;

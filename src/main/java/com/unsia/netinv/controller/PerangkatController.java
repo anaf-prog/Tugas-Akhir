@@ -35,6 +35,6 @@ public class PerangkatController {
         model.addAttribute("userRole", user.getRole());
         model.addAttribute("devices", devices);
         
-        return "perangkat"; // ini nama file HTML tanpa .html
+        return "perangkat";
     }
 }

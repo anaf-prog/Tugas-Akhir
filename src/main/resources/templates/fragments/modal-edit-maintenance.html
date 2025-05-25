@@ -1,0 +1,39 @@
+<!-- Edit Maintenance Modal -->
+<div class="modal fade" id="editMaintenanceModal" tabindex="-1" aria-labelledby="editMaintenanceModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editMaintenanceModalLabel">Edit Data Pemeliharaan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editMaintenanceForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editId" name="id">
+                    <div class="mb-3">
+                        <label for="editDeviceId" class="form-label">Perangkat</label>
+                        <select class="form-select" id="editDeviceId" name="deviceId" required>
+                            <option value="">Pilih Perangkat</option>
+                            <!-- Options akan diisi via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMaintenanceDate" class="form-label">Tanggal Pemeliharaan</label>
+                        <input type="datetime-local" class="form-control" id="editMaintenanceDate" name="maintenanceDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTechnician" class="form-label">Teknisi</label>
+                        <input type="text" class="form-control" id="editTechnician" name="technician" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Deskripsi Pemeliharaan</label>
+                        <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
