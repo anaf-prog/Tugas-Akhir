@@ -1,3 +1,16 @@
+jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+    "date-eu-pre": function(a) {
+        if (a == '-' || a == '') return 0;
+        
+        // Handle format: "dd-MM-yyyy HH:mm:ss"
+        var dateParts = a.split(/[- :]/);
+        // dateParts[0] = hari, [1] = bulan, [2] = tahun, [3] = jam, dst
+        return Date.UTC(dateParts[2], dateParts[1]-1, dateParts[0], dateParts[3], dateParts[4], dateParts[5]);
+    },
+    "date-eu-asc": function(a, b) { return a - b; },
+    "date-eu-desc": function(a, b) { return b - a; }
+});
+
 $(document).ready(function() {
     // Inisialisasi DataTable
     var table = $('#monitoringLogsTable').DataTable({
@@ -18,7 +31,11 @@ $(document).ready(function() {
         "order": [[5, "desc"]],
         "columnDefs": [
             { "targets": [0], "visible": false },
-            { "orderable": false, "targets": [1, 6] }
+            { "orderable": false, "targets": [1, 6] },
+            { 
+                "type": "date-eu",
+                "targets": 5        
+            }
         ],
         "dom": '<"top"<"row"<"col-md-6"l><"col-md-6"f>>>' +
                'rt' +
@@ -48,10 +65,11 @@ $(document).ready(function() {
     $('#dateFilter').on('change', function() {
         var selectedDate = $(this).val();
         if (selectedDate) {
-            // Cari tanggal dalam format yang sesuai dengan tampilan (dd-MM-yyyy)
-            table.column(4).search(selectedDate.split('-').reverse().join('-')).draw();
+            // Konversi dari yyyy-mm-dd ke dd-mm-yyyy untuk pencarian
+            var formattedDate = selectedDate.split('-').reverse().join('-');
+            table.column(5).search(formattedDate).draw(); // Kolom 5 = Waktu Monitoring
         } else {
-            table.column(4).search('').draw();
+            table.column(5).search('').draw();
         }
     });
 
