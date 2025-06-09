@@ -77,7 +77,7 @@ public class FailoverServiceImpl implements FailoverService {
 
     // Method untuk menghitung response time (contoh sederhana)
     private Integer calculateResponseTime(Device device) {
-        return (int) (Math.random() * 150) + 50;
+        return (int) (Math.random() * 101) + 950;
     }
     
 }

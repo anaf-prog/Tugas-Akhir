@@ -15,9 +15,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.unsia.netinv.entity.Device;
+import com.unsia.netinv.entity.FailOverLogs;
 import com.unsia.netinv.entity.MonitoringLog;
 import com.unsia.netinv.entity.Users;
 import com.unsia.netinv.repository.DeviceRepository;
+import com.unsia.netinv.repository.FailOverLogRepository;
 import com.unsia.netinv.repository.MonitoringLogRepository;
 
 @Service
@@ -29,8 +31,13 @@ public class DashboardServiceImpl implements DashboardService {
     @Autowired
     private MonitoringLogRepository monitoringLogRepository;
 
+    @Autowired
+    private FailOverLogRepository failOverLogRepository;
+
     @Override
-    public Map<String, Object> getDashboardData(int devicePage, int deviceSize, int logPage, int logSize, String search, String status, String type, Users user) {
+    public Map<String, Object> getDashboardData(int devicePage, int deviceSize, int logPage, int logSize,
+                                                int failoverPage, int failoverSize, 
+                                                String search, String status, String type, Users user) {
         Map<String, Object> data = new HashMap<>();
 
         Specification<Device> countSpec = new DeviceSpecification(search, status, type);
@@ -53,6 +60,9 @@ public class DashboardServiceImpl implements DashboardService {
         Pageable logPageable = PageRequest.of(logPage, logSize, Sort.by("monitoring").descending());
         Page<MonitoringLog> logPageResult = monitoringLogRepository.findLatestLogPerDevice(logPageable);
 
+        Pageable failoverPageable = PageRequest.of(failoverPage, failoverSize, Sort.by("waktu").descending());
+        Page<FailOverLogs> failoverPageResult = failOverLogRepository.findAllByOrderByWaktuDesc(failoverPageable);
+
         data.put("currentUser", user.getUsername());
         data.put("userRole", user.getRole());
         data.put("totalDevices", totalDevices);
@@ -71,6 +81,11 @@ public class DashboardServiceImpl implements DashboardService {
         data.put("logCurrentPage", logPageResult.getNumber());
         data.put("logTotalPages", logPageResult.getTotalPages());
         data.put("logTotalItems", logPageResult.getTotalElements());
+
+        data.put("failoverLogs", failoverPageResult.getContent());
+        data.put("failoverCurrentPage", failoverPageResult.getNumber());
+        data.put("failoverTotalPages", failoverPageResult.getTotalPages());
+        data.put("failoverTotalItems", failoverPageResult.getTotalElements());
 
         return data;
     }

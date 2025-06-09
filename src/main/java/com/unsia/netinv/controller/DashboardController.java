@@ -28,6 +28,8 @@ public class DashboardController {
                                @RequestParam(value = "deviceSize", defaultValue = "5") int deviceSize,
                                @RequestParam(value = "logPage", defaultValue = "0") int logPage,
                                @RequestParam(value = "logSize", defaultValue = "5") int logSize,
+                               @RequestParam(value = "failoverPage", defaultValue = "0") int failoverPage,
+                               @RequestParam(value = "failoverSize", defaultValue = "5") int failoverSize,
                                @RequestParam(value = "search", required = false) String search,
                                @RequestParam(value = "status", required = false) String status,
                                @RequestParam(value = "type", required = false) String type,
@@ -39,7 +41,8 @@ public class DashboardController {
             return "redirect:/login";
         }
 
-        Map<String, Object> dashboardData = dashboardService.getDashboardData(devicePage, deviceSize, logPage, logSize, search, status, type, user);
+        Map<String, Object> dashboardData = dashboardService.getDashboardData(devicePage, deviceSize, logPage, logSize, 
+                                                                              failoverPage, failoverSize, search, status, type, user);
         model.addAllAttributes(dashboardData);
 
         model.addAttribute("searchParam", search);

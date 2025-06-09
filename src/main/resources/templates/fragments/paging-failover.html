@@ -1,0 +1,135 @@
+<!-- Paging Failover -->
+<div th:if="${failoverTotalPages > 1}">
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+
+            <!-- First Page -->
+            <li class="page-item" th:classappend="${failoverCurrentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
+                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                           logPage=${logCurrentPage},
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           failoverPage=0,
+                                           failoverSize=${param.failoverSize != null ? param.failoverSize : 5},
+                                           search=${searchParam},
+                                           status=${statusParam},
+                                           type=${typeParam})}">
+                    <span>&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Previous Page -->
+            <li class="page-item" th:classappend="${failoverCurrentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
+                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                           logPage=${logCurrentPage},
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           failoverPage=${failoverCurrentPage - 1},
+                                           failoverSize=${param.failoverSize != null ? param.failoverSize : 5},
+                                           search=${searchParam},
+                                           status=${statusParam},
+                                           type=${typeParam})}">
+                    <span>&lsaquo;</span>
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            <li th:each="i : ${#numbers.sequence(
+                    (failoverCurrentPage < 5) ? 0 : 
+                    (failoverCurrentPage > failoverTotalPages - 5) ? (failoverTotalPages > 9 ? failoverTotalPages - 9 : 0) : 
+                    failoverCurrentPage - 4, 
+                    
+                    (failoverCurrentPage < 5) ? 
+                        ((failoverTotalPages - 1) < 8 ? (failoverTotalPages - 1) : 8) : 
+                    (failoverCurrentPage > failoverTotalPages - 5) ? 
+                        (failoverTotalPages - 1) : 
+                        (failoverCurrentPage + 4)
+                )}"
+                th:if="${i >= 0 and i < failoverTotalPages}"
+                class="page-item" 
+                th:classappend="${i == failoverCurrentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
+                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                           logPage=${logCurrentPage},
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           failoverPage=${i},
+                                           failoverSize=${param.failoverSize != null ? param.failoverSize : 5},
+                                           search=${searchParam},
+                                           status=${statusParam},
+                                           type=${typeParam})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- Next Page -->
+            <li class="page-item" th:classappend="${failoverCurrentPage == failoverTotalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
+                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                           logPage=${logCurrentPage},
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           failoverPage=${failoverCurrentPage + 1},
+                                           failoverSize=${param.failoverSize != null ? param.failoverSize : 5},
+                                           search=${searchParam},
+                                           status=${statusParam},
+                                           type=${typeParam})}">
+                    <span>&rsaquo;</span>
+                </a>
+            </li>
+
+            <!-- Last Page -->
+            <li class="page-item" th:classappend="${failoverCurrentPage == failoverTotalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
+                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                           logPage=${logCurrentPage},
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           failoverPage=${failoverTotalPages - 1},
+                                           failoverSize=${param.failoverSize != null ? param.failoverSize : 5},
+                                           search=${searchParam},
+                                           status=${statusParam},
+                                           type=${typeParam})}">
+                    <span>&raquo;</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div th:if="${failoverTotalPages > 1}" class="d-flex justify-content-between mt-3">
+    <div>
+        <span>Menampilkan 
+            <span th:text="${failoverCurrentPage * failoverSize + 1}">1</span> - 
+            <span th:text="${(failoverCurrentPage + 1) * failoverSize > failoverTotalItems ? failoverTotalItems : (failoverCurrentPage + 1) * failoverSize}">5</span> dari 
+            <span th:text="${failoverTotalItems}">0</span> data
+        </span>
+    </div>
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" th:classappend="${failoverCurrentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/dashboard(devicePage=${devicePage},deviceSize=${deviceSize},logPage=${logPage},logSize=${logSize},failoverPage=${failoverCurrentPage - 1},failoverSize=${failoverSize},search=${searchParam},status=${statusParam},type=${typeParam})}">Sebelumnya</a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(0, failoverTotalPages - 1)}" 
+                class="page-item" th:classappend="${i == failoverCurrentPage} ? 'active'">
+                <a class="page-link" th:href="@{/dashboard(devicePage=${devicePage},deviceSize=${deviceSize},logPage=${logPage},logSize=${logSize},failoverPage=${i},failoverSize=${failoverSize},search=${searchParam},status=${statusParam},type=${typeParam})}" 
+                    th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${failoverCurrentPage == failoverTotalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/dashboard(devicePage=${devicePage},deviceSize=${deviceSize},logPage=${logPage},logSize=${logSize},failoverPage=${failoverCurrentPage + 1},failoverSize=${failoverSize},search=${searchParam},status=${statusParam},type=${typeParam})}">Selanjutnya</a>
+            </li>
+        </ul>
+    </nav>
+</div> -->

@@ -1,0 +1,52 @@
+<!-- Tabel Failover -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Failover</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nama Perangkat Down</th>
+                                <th>Ip Perangkat Down</th>
+                                <th>Nama Perangkat Backup</th>
+                                <th>Ip Perangkat Backup</th>
+                                <th>Waktu Perangkat Down</th>
+                                <th>Durasi Perangkat Pindah Jalur</th> 
+                                <th>Status Failover<th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             <tr th:each="log : ${failoverLogs}">
+                                <td th:text="${log.mainDevice.deviceName}">-</td>
+                                <td th:text="${log.mainDevice.ipAddress}">-</td>
+                                <td th:text="${log.backupDevice.deviceName}">-</td>
+                                <td th:text="${log.backupDevice.ipAddress}">-</td>
+                                <td th:text="${#dates.format(log.waktu, 'dd-MM-yyyy HH:mm:ss.SSS')}">-</td>
+                                
+                                <td th:text="'Durasi pindah jalur : ' + ${log.responseTimeMs} + ' milidetik - (' 
+                                    + ${#dates.format(log.waktuSetelahPindah, 'dd-MM-yyyy HH:mm:ss.SSS')} + ')'">-
+                                </td>
+
+                                <td>
+                                    <span th:if="${log.status == 'SUCCESS'}" class="badge bg-success">Berhasil</span>
+                                    <span th:if="${log.status != 'SUCCESS'}" class="badge bg-danger">Gagal</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${failoverLogs.empty}">
+                                <td colspan="7" class="text-center">Tidak ada data failover</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paging Dashboard -->
+                    <div th:insert="~{fragments/paging-failover.html}"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
