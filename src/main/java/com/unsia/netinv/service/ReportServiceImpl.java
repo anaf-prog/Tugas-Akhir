@@ -59,7 +59,7 @@ public class ReportServiceImpl implements ReportService {
     public Map<String, Object> getReportPageData(Users user) {
         Map<String, Object> data = new HashMap<>();
 
-        List<Report> reports = reportRepository.findAll();
+        List<Report> reports = reportRepository.findAllByOrderByIssueDateDesc();
         List<Device> devices = deviceRepository.findAll();
         List<MonitoringLog> monitoringLogs = monitoringLogRepository.findAllByOrderByMonitoringDesc();
 
