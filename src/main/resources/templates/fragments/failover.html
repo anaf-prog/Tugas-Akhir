@@ -15,7 +15,8 @@
                                 <th>Nama Perangkat Backup</th>
                                 <th>Ip Perangkat Backup</th>
                                 <th>Waktu Perangkat Down</th>
-                                <th>Durasi Perangkat Pindah Jalur</th> 
+                                <th>Durasi Perangkat Pindah Jalur</th>
+                                <th>Waktu Perangkat Kembali Normal</th>
                                 <th>Status Failover<th>
                             </tr>
                         </thead>
@@ -29,6 +30,11 @@
                                 
                                 <td th:text="'Durasi pindah jalur : ' + ${log.responseTimeMs} + ' milidetik - (' 
                                     + ${#dates.format(log.waktuSetelahPindah, 'dd-MM-yyyy HH:mm:ss.SSS')} + ')'">-
+                                </td>
+
+                                <td th:with="repairTime=${log.repairTime}">
+                                    <span th:if="${repairTime != null}" th:text="${#temporals.format(repairTime, 'dd-MM-yyyy HH:mm:ss.SSS')}"></span>
+                                    <span th:unless="${repairTime != null}">-</span>
                                 </td>
 
                                 <td>

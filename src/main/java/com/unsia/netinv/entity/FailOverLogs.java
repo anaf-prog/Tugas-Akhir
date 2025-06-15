@@ -1,5 +1,7 @@
 package com.unsia.netinv.entity;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -24,6 +26,9 @@ public class FailOverLogs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "repair_time")
+    private LocalDateTime repairTime;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "waktu")
     private Date waktu;
@@ -41,6 +46,20 @@ public class FailOverLogs {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "backup_device_id", referencedColumnName = "id", nullable = false)
     private Device backupDevice;
+
+    @Transient
+    public Date getRepairDate() {
+        // Diisi oleh service
+        return null;
+    }
+
+    @Transient
+    public String getFormattedRepairDate() {
+        Date repairDate = getRepairDate();
+        return repairDate != null ? 
+               new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS").format(repairDate) : 
+               "-";
+    }
 
     /** Waktu setelah perangkat benar-benar pindah jalur (waktu + responseTimeMs) */
     @Transient
