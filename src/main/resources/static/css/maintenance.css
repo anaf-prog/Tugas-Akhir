@@ -112,3 +112,16 @@
     min-width: 100px;
 }
 
+.countdown {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.countdown.soon {
+    color: #ffc107;
+}
+
+.countdown.completed {
+    color: #28a745;
+}

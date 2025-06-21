@@ -1,5 +1,6 @@
 package com.unsia.netinv.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,11 @@ public interface MaintenanceLogRepository extends JpaRepository<MaintenanceLog, 
 
     @Query("SELECT ml FROM MaintenanceLog ml LEFT JOIN FETCH ml.device ORDER BY ml.maintenanceDate DESC")
     List<MaintenanceLog> findAllWithDevice();
+
+    @Query("SELECT m FROM MaintenanceLog m JOIN FETCH m.device ORDER BY m.maintenanceDate DESC")
+    List<MaintenanceLog> findAllWithDeviceOrderedByMaintenanceDateDesc();
+
+
+
+    List<MaintenanceLog> findByScheduledTimeAfterAndAutoDisable(LocalDateTime now, boolean b);
 }

@@ -20,6 +20,15 @@
                         <input type="datetime-local" class="form-control" id="maintenanceDate" name="maintenanceDate" required>
                     </div>
                     <div class="mb-3">
+                        <label for="scheduledTime" class="form-label">Jadwal Maintenance</label>
+                        <input type="datetime-local" class="form-control" id="scheduledTime" name="scheduledTime">
+                        <small class="text-muted">Kosongkan jika maintenance dilakukan sekarang</small>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="autoDisable" name="autoDisable">
+                        <label class="form-check-label" for="autoDisable">Auto-disable perangkat saat waktu maintenance</label>
+                    </div>
+                    <div class="mb-3">
                         <label for="technician" class="form-label">Teknisi</label>
                         <input type="text" class="form-control" id="technician" name="technician" required>
                     </div>

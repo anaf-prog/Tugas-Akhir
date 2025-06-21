@@ -1,5 +1,7 @@
 package com.unsia.netinv.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,13 +10,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MaintenanceLogRequest {
-    private DeviceDTO device;
-    private String MaintenanceDate;
+    @NotNull(message = "Device ID tidak boleh kosong")
+    private Long deviceId;
+    
+    @NotBlank(message = "Tanggal maintenance tidak boleh kosong")
+    private String maintenanceDate;
+    
+    private String scheduledTime;
+    private Boolean autoDisable = false;
+    
+    @NotBlank(message = "Nama teknisi tidak boleh kosong")
     private String technician;
+    
+    @NotBlank(message = "Deskripsi tidak boleh kosong")
     private String description;
 
-    @Data
-    public static class DeviceDTO {
-        private Long id;
-    }
 }

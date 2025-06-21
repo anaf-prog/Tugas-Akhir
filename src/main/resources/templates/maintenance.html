@@ -98,6 +98,7 @@
                                         <th>Nama Perangkat</th>
                                         <th>Deskripsi</th>
                                         <th>Teknisi</th>
+                                        <th>Jadwal Maintenance</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -107,6 +108,38 @@
                                         <td th:text="${log.device != null} ? ${log.device.deviceName} : 'Perangkat tidak ditemukan'"></td>
                                         <td th:text="${log.description}"></td>
                                         <td th:text="${log.technician}"></td>
+
+                                        <!-- <td>
+                                            <div th:if="${log.scheduledTime != null}">
+                                                <div class="scheduled-time"
+                                                    th:data-scheduled="${#temporals.format(log.scheduledTime, 'yyyy-MM-dd HH:mm:ss')}">
+                                                    <span class="countdown"></span>
+                                                    <small class="text-muted d-block">
+                                                        (<span th:text="${#dates.format(log.scheduledTime, 'dd-MM-yyyy HH:mm')}"></span>)
+                                                    </small>
+                                                </div>
+                                                <div th:if="${log.autoDisable}" class="badge bg-warning mt-1">Maintenance</div>
+                                            </div>
+                                            <div th:unless="${log.scheduledTime != null}">
+                                                -
+                                            </div>
+                                        </td> -->
+
+
+                                        <td>
+                                            <span th:if="${log.scheduledTime != null}">
+                                                <div class="scheduled-time" 
+                                                    th:data-scheduled="${#temporals.format(log.scheduledTime, 'yyyy-MM-dd HH:mm:ss')}">
+                                                    <span class="countdown"></span>
+                                                    <small class="text-muted d-block">
+                                                        (<span th:text="${#temporals.format(log.scheduledTime, 'dd-MM-yyyy HH:mm')}"></span>)
+                                                    </small>
+                                                </div>
+                                            </span>
+                                            <span th:if="${log.scheduledTime == null}">-</span>
+                                            <div th:if="${log.autoDisable}" class="badge bg-warning mt-1">Maintenance</div>
+                                        </td>
+
                                         <td>
                                             <button class="btn btn-sm btn-outline-primary" 
                                                     data-bs-toggle="modal" 
@@ -114,9 +147,16 @@
                                                     th:attr="data-id=${log.id}">
                                                 <i class="fas fa-edit"></i>
                                             </button>
+
                                             <button class="btn btn-sm btn-outline-danger ms-1 delete-btn"
                                                     th:attr="data-id=${log.id}">
                                                 <i class="fas fa-trash"></i>
+                                            </button>
+
+                                            <button class="btn btn-sm btn-outline-warning ms-1 disable-device-btn"
+                                                    th:attr="data-device-id=${log.device != null} ? ${log.device.id} : ''"
+                                                    th:disabled="${log.device == null}">
+                                                <i class="fas fa-power-off"></i> Nonaktifkan
                                             </button>
                                         </td>
                                     </tr>
@@ -134,9 +174,12 @@
 
     <!-- Edit Maintenance Modal -->
     <div th:insert="~{fragments/modal-edit-maintenance.html}"></div>
+
+    <!-- Non Aktif Maintenance Modal -->
+    <div th:insert="~{fragments/modal-delete-maintenance.html}"></div> 
     
     <!-- Delete Maintenance Modal -->
-    <div th:insert="~{fragments/modal-delete-maintenance.html}"></div> 
+    <div th:insert="~{fragments/modal-nonactive-maintenance.html}"></div> 
     
     <!-- Bootstrap & jQuery JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -148,5 +191,7 @@
     
     <!-- Custom JS -->
     <script th:src="@{/js/maintenance.js}"></script>
+    <script th:src="@{/js/maintenanceDevice.js}"></script>
+    <script th:src="@{/js/maintenanceCountDown.js}"></script>
 </body>
 </html>

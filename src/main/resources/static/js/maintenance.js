@@ -21,7 +21,7 @@ $(document).ready(function() {
                 previous: "Sebelumnya"
             }
         },
-        order: [[0, 'desc']],
+        // order: [[0, 'desc']],
         dom: '<"top"f>rt<"bottom"p>',
         info: false,
         lengthChange: false,
@@ -42,13 +42,39 @@ $(document).ready(function() {
     $('#addMaintenanceForm').on('submit', function(e) {
         e.preventDefault();
         
+        // Validasi form
         const formData = {
-            device: { id: $('#deviceId').val() },
+            deviceId: $('#deviceId').val(),
             maintenanceDate: $('#maintenanceDate').val(),
+            scheduledTime: $('#scheduledTime').val(),
+            autoDisable: $('#autoDisable').is(':checked'),
             technician: $('#technician').val(),
             description: $('#description').val()
         };
         
+        // Validasi frontend
+        if (!formData.deviceId) {
+            showAlert('danger', 'Perangkat harus dipilih');
+            return;
+        }
+        if (!formData.maintenanceDate) {
+            showAlert('danger', 'Tanggal maintenance harus diisi');
+            return;
+        }
+        if (!formData.technician) {
+            showAlert('danger', 'Teknisi harus diisi');
+            return;
+        }
+        if (!formData.description) {
+            showAlert('danger', 'Deskripsi harus diisi');
+            return;
+        }
+        if (formData.autoDisable && !formData.scheduledTime) {
+            showAlert('danger', 'Harap isi jadwal maintenance jika ingin mengaktifkan auto-disable');
+            return;
+        }
+        
+        // Kirim data
         $.ajax({
             url: '/api/maintenance',
             type: 'POST',
@@ -57,34 +83,48 @@ $(document).ready(function() {
             success: function(response) {
                 showAlert('success', response.message);
                 $('#addMaintenanceModal').modal('hide');
-                setTimeout(() => location.reload(), 4000); // Reload setelah 3 detik
+                setTimeout(() => location.reload(), 1500);
             },
             error: function(xhr) {
-                const errorMsg = xhr.responseJSON?.message || 'Gagal menyimpan data';
+                let errorMsg = 'Gagal menyimpan data';
+                try {
+                    // Coba parse response JSON
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMsg = response.message;
+                    }
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                }
                 showAlert('danger', errorMsg);
+                console.error('Full error response:', xhr.responseText);
             }
         });
     });
     
     // Load devices untuk modal tambah
     $.get('/api/devices')
-        .done(function(devices) {
-            console.log('Data perangkat:', devices);
-            $('#deviceId').empty().append('<option value="">Pilih Perangkat</option>');
-            
-            devices.forEach(function(device) {
-                // Pastikan properti yang diakses sesuai
-                const deviceName = device.name || device.deviceName;
-                if (device.id && deviceName) {
-                    $('#deviceId').append(`<option value="${device.id}">${deviceName}</option>`);
-                }
-            });
+    .done(function(devices) {
+        $('#deviceId').empty().append('<option value="">Pilih Perangkat</option>');
+        
+        devices.forEach(function(device) {
+            const deviceName = device.name || device.deviceName;
+            if (device.id && deviceName) {
+                $('#deviceId').append(`<option value="${device.id}">${deviceName}</option>`);
+            }
+        });
     })
     .fail(function(error) {
         console.error('Gagal memuat perangkat:', error);
         $('#deviceId').html('<option value="">Gagal memuat perangkat</option>');
     });
     
+    // Set default datetime untuk maintenanceDate dan scheduledTime
+    const now = new Date();
+    const nowStr = now.toISOString().slice(0, 16);
+    $('#maintenanceDate').val(nowStr);
+    $('#scheduledTime').val(nowStr);
+
     // Handle edit button click
     $('#editMaintenanceModal').on('show.bs.modal', function(event) {
         const button = $(event.relatedTarget);

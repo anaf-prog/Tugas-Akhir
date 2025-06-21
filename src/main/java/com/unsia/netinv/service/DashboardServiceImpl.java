@@ -2,6 +2,7 @@ package com.unsia.netinv.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +49,28 @@ public class DashboardServiceImpl implements DashboardService {
                                                 int failoverPage, int failoverSize, 
                                                 String search, String status, String type, Users user) {
         Map<String, Object> data = new HashMap<>();
+
+        List<Device> offlinDevices = deviceRepository.findByStatusDevice("OFFLINE");
+
+        for (Device device : offlinDevices) {
+            Optional<MonitoringLog> latestLogOpt = monitoringLogRepository.findTopByDeviceOrderByMonitoringDesc(device);
+
+            if (latestLogOpt.isPresent()) {
+                MonitoringLog log = latestLogOpt.get();
+                // Jika status ping masih true (ONLINE), update ke false (OFFLINE)
+                if (Boolean.TRUE.equals(log.getPingStatus())) {
+                    log.setPingStatus(false);
+                    monitoringLogRepository.save(log);
+                }
+            } else {
+                // Jika tidak ada log, buat log baru dengan status OFFLINE
+                MonitoringLog newLog = new MonitoringLog();
+                newLog.setDevice(device);
+                newLog.setPingStatus(false);
+                newLog.setMonitoring(new Date());
+                monitoringLogRepository.save(newLog);
+            }
+        }
 
         Specification<Device> countSpec = new DeviceSpecification(search, status, type);
 

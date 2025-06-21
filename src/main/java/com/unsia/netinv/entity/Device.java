@@ -40,7 +40,7 @@ public class Device {
     @NotBlank(message = "Nama perangkat wajib diisi")
     @Size(max = 255, message = "Nama perangkat maksimal 255 karakter")
     @Column (name = "device_name")
-    private String deviceName;
+    private String deviceName = "Unknown Device";
 
     @NotBlank(message = "IP Address wajib diisi")
     @Pattern(regexp = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", 
@@ -55,7 +55,7 @@ public class Device {
 
     @NotBlank(message = "Jenis perangkat wajib dipilih")
     @Column (name = "device_type")
-    private String deviceType;
+    private String deviceType = "OTHER";
 
     @NotBlank(message = "Status perangkat wajib dipilih")
     @Column (name = "status_device")

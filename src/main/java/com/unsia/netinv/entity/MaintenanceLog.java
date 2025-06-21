@@ -2,6 +2,8 @@ package com.unsia.netinv.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,6 +29,13 @@ public class MaintenanceLog {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime maintenanceDate;
 
+    @Column(name = "scheduled_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime scheduledTime;
+
+    @Column(name = "auto_disable")
+    private Boolean autoDisable = false;
+
     @Column(name = "descriptions")
     private String description;
 
@@ -35,5 +44,6 @@ public class MaintenanceLog {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Device device;
 }

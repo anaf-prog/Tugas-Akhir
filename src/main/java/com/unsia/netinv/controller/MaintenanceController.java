@@ -40,7 +40,7 @@ public class MaintenanceController {
             model.addAttribute("errorMessage", error);
         }
 
-        List<MaintenanceLog> maintenanceLogs = maintenanceLogRepository.findAllWithDevice();
+        List<MaintenanceLog> maintenanceLogs = maintenanceLogRepository.findAllWithDeviceOrderedByMaintenanceDateDesc();
 
         model.addAttribute("currentUser", user.getUsername());
         model.addAttribute("userRole", user.getRole());
