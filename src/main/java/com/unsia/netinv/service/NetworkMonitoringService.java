@@ -1,5 +1,6 @@
 package com.unsia.netinv.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.unsia.netinv.entity.Device;
@@ -11,4 +12,6 @@ public interface NetworkMonitoringService {
     void monitoringAlldevices();
 
     List<MonitoringLog> getLatestMonitoringLogs(int count);
+
+    void updateFailoverRepairTime(Device device, Date repairDate);
 }

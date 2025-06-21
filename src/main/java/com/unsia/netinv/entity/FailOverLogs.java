@@ -2,6 +2,7 @@ package com.unsia.netinv.entity;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -12,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -51,6 +53,24 @@ public class FailOverLogs {
     public Date getRepairDate() {
         // Diisi oleh service
         return null;
+    }
+
+    @Column(name = "estimated_repair_time")
+    private LocalDateTime estimatedRepairTime;
+
+    @PrePersist
+    public void setDefaultEstimation() {
+        if (this.estimatedRepairTime == null) {
+            this.estimatedRepairTime = this.waktu.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .plusMinutes(60); // Default +1 jam
+        }
+    }
+
+    @Transient
+    public LocalDateTime getDisplayRepairTime() {
+        return repairTime != null ? repairTime : estimatedRepairTime;
     }
 
     @Transient

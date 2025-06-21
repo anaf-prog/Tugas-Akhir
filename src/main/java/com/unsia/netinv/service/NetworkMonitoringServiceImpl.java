@@ -1,5 +1,6 @@
 package com.unsia.netinv.service;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,14 +17,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.unsia.netinv.entity.Device;
+import com.unsia.netinv.entity.FailOverLogs;
 import com.unsia.netinv.entity.MonitoringLog;
 import com.unsia.netinv.netinve.LogReason;
 import com.unsia.netinv.repository.DeviceRepository;
+import com.unsia.netinv.repository.FailOverLogRepository;
 import com.unsia.netinv.repository.MonitoringLogRepository;
 
 @Service
 public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
-    // private static final Logger logger = LoggerFactory.getLogger(NetworkMonitoringServiceImpl.class);
+    @SuppressWarnings("unused")
+    private static final Logger logger = LoggerFactory.getLogger(NetworkMonitoringServiceImpl.class);
 
     @Autowired
     private DeviceRepository deviceRepository;
@@ -42,6 +46,9 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
 
     @Autowired
     private FailoverService failoverService;
+
+    @Autowired
+    private FailOverLogRepository failOverLogRepository;
 
     @Override
     @Scheduled(fixedRate = 60000) 
@@ -112,11 +119,16 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
         log.setLogReason(reason);
         monitoringLogRepository.save(log);
 
+        if (isOnline && reason == LogReason.RECOVERED) {
+            updateFailoverRepairTime(device, log.getMonitoring());
+        }
+
         // logger.debug("Created NEW log for device {} with reason {}", device.getDeviceName(), reason);
         System.out.println("Created NEW log for device {} with reason {}" + device.getDeviceName() + reason);
     }
 
     private void updateLastLog(Device device, boolean isOnline, Long responseTime) {
+        @SuppressWarnings("unused")
         Pageable latest = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "monitoring"));
         Optional<MonitoringLog> lastLogOpt = monitoringLogRepository.findTopByDeviceOrderByMonitoringDesc(device);
 
@@ -163,5 +175,22 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
 
         latestLogs.sort((a, b) -> b.getMonitoring().compareTo(a.getMonitoring()));
         return latestLogs.stream().limit(count).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateFailoverRepairTime(Device device, Date repairDate) {
+        // Cari failover terakhir yang belum diperbaiki
+        Optional<FailOverLogs> openFailover = 
+            failOverLogRepository.findTopByMainDeviceAndRepairTimeIsNullOrderByWaktuDesc(device);
+
+        // Jika ada, set repairTime = waktu monitoring log (waktu ONLINE)
+        openFailover.ifPresent(failover -> {
+            failover.setRepairTime(
+                repairDate.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
+            );
+            failOverLogRepository.save(failover);
+        });
     }
 }

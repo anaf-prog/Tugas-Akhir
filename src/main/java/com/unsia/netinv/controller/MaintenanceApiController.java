@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -166,32 +167,63 @@ public class MaintenanceApiController {
         try {
             Optional<MaintenanceLog> existingLog = maintenanceLogRepository.findById(id);
             if (!existingLog.isPresent()) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                        "message", "Data maintenance tidak ditemukan",
+                        "error", "Maintenance log with ID " + id + " not found"
+                    ));
             }
 
+            Optional<Device> deviceOptional = deviceRepository.findById(request.getDeviceId());
+            if (!deviceOptional.isPresent()) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "message", "Device tidak ditemukan",
+                        "error", "Device with ID " + request.getDeviceId() + " not found"
+                    ));
+            }
+            
             MaintenanceLog logToUpdate = existingLog.get();
+            logToUpdate.setDevice(deviceOptional.get());
             
-            // Update data
-            Device device = new Device();
-            device.setId(request.getDeviceId());
-            logToUpdate.setDevice(device);
+            try {
+                logToUpdate.setMaintenanceDate(LocalDateTime.parse(request.getMaintenanceDate()));
+            } catch (DateTimeParseException e) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "message", "Format tanggal tidak valid",
+                        "error", "Invalid date format. Expected format: yyyy-MM-dd'T'HH:mm:ss"
+                    ));
+            }
             
-            logToUpdate.setMaintenanceDate(LocalDateTime.parse(request.getMaintenanceDate()));
             logToUpdate.setTechnician(request.getTechnician());
             logToUpdate.setDescription(request.getDescription());
 
             MaintenanceLog updatedLog = maintenanceLogRepository.save(logToUpdate);
             
-            return ResponseEntity.ok(Map.of(
-                "message", "Data pemeliharaan berhasil diperbarui",
-                "data", updatedLog
+            // Buat response DTO manual untuk menghindari masalah serialisasi
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Data pemeliharaan berhasil diperbarui");
+            response.put("data", Map.of(
+                "id", updatedLog.getId(),
+                "maintenanceDate", updatedLog.getMaintenanceDate().toString(),
+                "technician", updatedLog.getTechnician(),
+                "description", updatedLog.getDescription(),
+                "deviceId", updatedLog.getDevice().getId()
             ));
             
+            return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
+            
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "message", "Gagal memperbarui data",
-                "error", e.getMessage()
-            ));
+            log.error("Error updating maintenance log", e);
+            return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of(
+                    "message", "Gagal memperbarui data",
+                    "error", e.getMessage() != null ? e.getMessage() : "Unknown error occurred"
+                ));
         }
     }
 

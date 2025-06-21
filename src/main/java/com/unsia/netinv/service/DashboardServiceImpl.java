@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import com.unsia.netinv.entity.Device;
 import com.unsia.netinv.entity.FailOverLogs;
 import com.unsia.netinv.entity.MonitoringLog;
-import com.unsia.netinv.entity.Report;
 import com.unsia.netinv.entity.Users;
 import com.unsia.netinv.repository.DeviceRepository;
 import com.unsia.netinv.repository.FailOverLogRepository;
@@ -42,7 +41,7 @@ public class DashboardServiceImpl implements DashboardService {
     private FailOverLogRepository failOverLogRepository;
 
     @Autowired
-    private ReportRepository reportRepository;
+    ReportRepository reportRepository;
 
     @Override
     public Map<String, Object> getDashboardData(int devicePage, int deviceSize, int logPage, int logSize,
@@ -96,37 +95,21 @@ public class DashboardServiceImpl implements DashboardService {
         Page<FailOverLogs> failoverPageResult = failOverLogRepository.findAllByOrderByWaktuDesc(failoverPageable);
 
         List<FailOverLogs> failoverLogs = failoverPageResult.getContent();
-        LocalDateTime now = LocalDateTime.now();
 
         for (FailOverLogs log : failoverLogs) {
-            // Jika sudah ada repairTime yang disimpan, gunakan itu
-            if (log.getRepairTime() != null) {
-                continue;
-            }
-            
-            Optional<Report> latestReport = reportRepository.findTopByDeviceOrderByRepairDateDesc(log.getMainDevice());
-            LocalDateTime waktuDown = log.getWaktu()
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-            
-            if (latestReport.isPresent()) {
-                LocalDateTime repairDate = latestReport.get().getRepairDate();
-                // Validasi repair date: tidak null, tidak sebelum waktu down, dan tidak di masa depan
-                if (repairDate != null && !repairDate.isBefore(waktuDown) && !repairDate.isAfter(now)) {
-                    log.setRepairTime(repairDate);
-                    failOverLogRepository.save(log);
-                    continue;
-                }
-            }
+            if (log.getRepairTime() == null) {
+                LocalDateTime waktuDown = log.getWaktu().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
 
-            long seed = log.getMainDevice().getId(); 
-            int minutesToAdd = 30 + new Random(seed).nextInt(90);
-            LocalDateTime estimatedTime = waktuDown.plusMinutes(minutesToAdd);
-            
-            log.setRepairTime(estimatedTime);
-            failOverLogRepository.save(log); // Simpan ke database
+                long seed = log.getMainDevice().getId();
+                int minutesToAdd = 30 + new Random(seed).nextInt(90);
+                LocalDateTime estimatedTime = waktuDown.plusMinutes(minutesToAdd);
+                
+                log.setEstimatedRepairTime(estimatedTime);
+            }
         }
+
 
         data.put("currentUser", user.getUsername());
         data.put("userRole", user.getRole());

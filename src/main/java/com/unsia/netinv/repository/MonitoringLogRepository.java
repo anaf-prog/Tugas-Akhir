@@ -7,11 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.unsia.netinv.entity.Device;
 import com.unsia.netinv.entity.MonitoringLog;
+import com.unsia.netinv.netinve.LogReason;
 
 @Repository
 public interface MonitoringLogRepository extends JpaRepository<MonitoringLog, Long>, JpaSpecificationExecutor<MonitoringLog> {
@@ -66,6 +70,12 @@ public interface MonitoringLogRepository extends JpaRepository<MonitoringLog, Lo
     Page<MonitoringLog> findLatestLogPerDevice(Pageable pageable);
 
     List<MonitoringLog> findAllByOrderByMonitoringDesc();
+
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE MonitoringLog m SET m.logReason = :reason WHERE m.logReason IS NULL")
+    void setDefaultLogReason(@Param("reason") LogReason reason);
 
 
     

@@ -160,32 +160,20 @@ $(document).ready(function() {
     $('#editMaintenanceForm').on('submit', function(e) {
         e.preventDefault();
         
-        // Debug: Lihat data sebelum dikirim
-        console.log('Data yang akan dikirim:', {
-            id: $('#editId').val(),
-            deviceId: $('#editDeviceId').val(),
-            maintenanceDate: $('#editMaintenanceDate').val(),
-            technician: $('#editTechnician').val(),
-            description: $('#editDescription').val()
-        });
-
         const formData = {
-            id: $('#editId').val(),
-            device: { 
-                id: $('#editDeviceId').val() 
-            },
+            deviceId: $('#editDeviceId').val(),
             maintenanceDate: $('#editMaintenanceDate').val(),
             technician: $('#editTechnician').val(),
             description: $('#editDescription').val()
         };
         
-        // Debug: Lihat data setelah diformat
-        console.log('Data formatted:', JSON.stringify(formData));
+        const id = $('#editId').val();
 
         $.ajax({
-            url: `/api/maintenance/${formData.id}`,
+            url: `/api/maintenance/${id}`,
             type: 'PUT',
             contentType: 'application/json',
+            dataType: 'json', // tambahkan ini untuk memastikan response diparse sebagai JSON
             data: JSON.stringify(formData),
             success: function(response) {
                 console.log('Response sukses:', response);
@@ -193,17 +181,26 @@ $(document).ready(function() {
                 $('#editMaintenanceModal').modal('hide');
                 setTimeout(() => location.reload(), 1500);
             },
-            error: function(xhr) {
-                console.error('Error response:', xhr.responseJSON);
-                const errorMsg = xhr.responseJSON?.message || 
-                                xhr.responseJSON?.error || 
-                                'Gagal memperbarui data pemeliharaan';
-                showAlert('danger', errorMsg);
+            error: function(xhr, textStatus, errorThrown) {
+                console.error('AJAX Error:', {
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    textStatus: textStatus,
+                    errorThrown: errorThrown,
+                    responseText: xhr.responseText
+                });
                 
-                // Tambahkan ini untuk melihat detail error di console
-                if (xhr.responseJSON) {
-                    console.error('Detail error:', xhr.responseJSON);
+                let errorMsg = 'Gagal memperbarui data pemeliharaan';
+                
+                try {
+                    // Coba parse responseText jika responseJSON tidak ada
+                    const errorResponse = xhr.responseJSON || JSON.parse(xhr.responseText);
+                    errorMsg = errorResponse.message || errorResponse.error || errorMsg;
+                } catch (e) {
+                    errorMsg = xhr.responseText || errorMsg;
                 }
+                
+                showAlert('danger', errorMsg);
             }
         });
     });

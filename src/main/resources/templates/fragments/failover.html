@@ -32,10 +32,21 @@
                                     + ${#dates.format(log.waktuSetelahPindah, 'dd-MM-yyyy HH:mm:ss.SSS')} + ')'">-
                                 </td>
 
-                                <td th:with="repairTime=${log.repairTime}">
+                                <td>
+                                    <span th:if="${log.repairTime != null}" 
+                                        th:text="${#temporals.format(log.repairTime, 'dd-MM-yyyy HH:mm:ss.SSS')}">
+                                    </span>
+                                    <span th:if="${log.repairTime == null and log.estimatedRepairTime != null}" 
+                                        th:text="${#temporals.format(log.estimatedRepairTime, 'dd-MM-yyyy HH:mm:ss.SSS')} + ' (estimasi)'">
+                                    </span>
+                                    <span th:if="${log.repairTime == null and log.estimatedRepairTime == null}">-</span>
+                                </td>
+
+                                <!-- asli -->
+                                <!-- <td th:with="repairTime=${log.repairTime}">
                                     <span th:if="${repairTime != null}" th:text="${#temporals.format(repairTime, 'dd-MM-yyyy HH:mm:ss.SSS')}"></span>
                                     <span th:unless="${repairTime != null}">-</span>
-                                </td>
+                                </td> -->
 
                                 <td>
                                     <span th:if="${log.status == 'SUCCESS'}" class="badge bg-success">Berhasil</span>

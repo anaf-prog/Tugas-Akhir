@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 import com.unsia.netinv.dto.ReportEdit;
 import com.unsia.netinv.dto.ReportForm;
 import com.unsia.netinv.entity.Device;
+import com.unsia.netinv.entity.FailOverLogs;
 import com.unsia.netinv.entity.MonitoringLog;
 import com.unsia.netinv.entity.Report;
 import com.unsia.netinv.entity.Users;
+import com.unsia.netinv.netinve.LogReason;
 import com.unsia.netinv.netinve.ReportStatus;
 import com.unsia.netinv.repository.DeviceRepository;
+import com.unsia.netinv.repository.FailOverLogRepository;
 import com.unsia.netinv.repository.MonitoringLogRepository;
 import com.unsia.netinv.repository.ReportRepository;
 
@@ -31,6 +34,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private MonitoringLogRepository monitoringLogRepository;
+
+    @Autowired
+    private FailOverLogRepository failOverLogRepository;
 
     @Override
     public void createReport(ReportForm reportForm) {
@@ -47,6 +53,28 @@ public class ReportServiceImpl implements ReportService {
         report.setStatus(reportForm.getStatus());
 
         reportRepository.save(report);
+
+        System.out.println("Mencari failover log untuk device: " + device.getDeviceName());
+
+        // CARI FailOverLogs yang belum diperbaiki DAN waktunya sebelum repairDate
+        List<FailOverLogs> relatedFailovers = failOverLogRepository
+            .findByMainDeviceAndRepairTimeIsNullAndWaktuBefore(
+                device, 
+                report.getRepairDate()
+            );
+
+        System.out.println("Jumlah failover ditemukan: " + relatedFailovers.size());
+
+        // Ubah repairTime di log yang waktu down-nya sebelum repairDate
+        for (FailOverLogs log : relatedFailovers) {
+            log.setRepairTime(report.getRepairDate());
+            failOverLogRepository.save(log); 
+        }
+
+        if (reportForm.getStatus() == ReportStatus.SELESAI) {
+            device.setStatusDevice("ONLINE");
+            deviceRepository.save(device);
+        }
     }
 
     public static String formatDate(Date date) {
@@ -58,6 +86,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Map<String, Object> getReportPageData(Users user) {
         Map<String, Object> data = new HashMap<>();
+
+        monitoringLogRepository.setDefaultLogReason(LogReason.MAINTENANCE);
 
         List<Report> reports = reportRepository.findAllByOrderByIssueDateDesc();
         List<Device> devices = deviceRepository.findAll();
