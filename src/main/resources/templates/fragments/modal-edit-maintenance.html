@@ -16,18 +16,27 @@
                             <!-- Options akan diisi via JavaScript -->
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="editMaintenanceDate" class="form-label">Tanggal Pemeliharaan</label>
                         <input type="datetime-local" class="form-control" id="editMaintenanceDate" name="maintenanceDate" required>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="repairCompletionTime" class="form-label">Selesai Perbaikan</label>
+                        <input type="datetime-local" class="form-control" id="repairCompletionTime" name="repairCompletionTime">
+                    </div>
+
                     <div class="mb-3">
                         <label for="editTechnician" class="form-label">Teknisi</label>
                         <input type="text" class="form-control" id="editTechnician" name="technician" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="editDescription" class="form-label">Deskripsi Pemeliharaan</label>
                         <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

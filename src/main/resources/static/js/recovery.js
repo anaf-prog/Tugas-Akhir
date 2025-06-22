@@ -1,5 +1,5 @@
 /**
- * recovery.js - Handle device recovery functionality dengan Modal Notifikasi
+ * recovery.js - Handle device recovery functionality dengan Modal Notifikasi (Updated)
  */
 
 // Fungsi untuk menampilkan modal notifikasi
@@ -32,27 +32,31 @@ function showRecoveryModal(type, message) {
     if (type === 'success') {
         setTimeout(() => {
             modalInstance.hide();
-        }, 5000);
+            // Refresh data setelah modal ditutup
+            updateDeviceStatus();
+        }, 3000);
     }
 }
 
 // Fungsi untuk handle recovery device
 function setupRecoveryButtons() {
     $(document).off('click', '.recovery-btn').on('click', '.recovery-btn', function(e) {
-        // Cek status perangkat dari badge status, bukan dari data attribute
-        const isOnline = $(this).closest('tr').find('.badge').hasClass('bg-success');
+        e.preventDefault();
+        
+        const button = $(this);
+        const row = button.closest('tr');
+        const isOnline = row.find('.badge').hasClass('bg-success');
         
         // Jika perangkat online, hentikan proses
         if (isOnline) {
-            e.preventDefault();
-            e.stopPropagation();
             return false;
         }
         
-        const ipAddress = $(this).data('ip');
-        const button = $(this);
+        const ipAddress = button.data('ip');
+        const deviceId = row.data('device-id');
+        const deviceName = row.find('td:first').text();
         
-        console.log('Attempting recovery for IP:', ipAddress);
+        console.log('Attempting recovery for:', deviceName, 'IP:', ipAddress);
         
         // Tampilkan loading state
         button.prop('disabled', true);
@@ -64,21 +68,34 @@ function setupRecoveryButtons() {
             method: 'POST',
             data: { ipAddress: ipAddress },
             success: function(response) {
-                console.log('Recovery successful:', response);
-                showRecoveryModal('success', response.message);
+                console.log('Recovery response:', response);
                 
-                // Hanya reset tombol, biarkan monitoring scheduled update status
-                button.prop('disabled', false)
-                      .html('<i class="fas fa-sync-alt"></i> Recovery');
-                
-                // Verifikasi dengan data terbaru dari server
-                updateDeviceStatus();
+                if (response.success) {
+                    // Update UI secara langsung tanpa menunggu refresh
+                    row.find('.badge')
+                        .removeClass('bg-danger')
+                        .addClass('bg-success')
+                        .text('ONLINE');
+                    
+                    row.find('.ping-indicator')
+                        .removeClass('ping-inactive')
+                        .addClass('ping-active');
+                    
+                    button.removeClass('btn-success')
+                          .addClass('btn-secondary disabled');
+                    
+                    showRecoveryModal('success', response.message);
+                } else {
+                    showRecoveryModal('danger', response.message || 'Recovery gagal');
+                }
             },
             error: function(xhr) {
-                console.error('Recovery failed:', xhr.responseText);
-                const errorMsg = xhr.responseJSON?.message || xhr.responseText || 'Terjadi kesalahan';
-                
-                showRecoveryModal('danger', 'Gagal melakukan recovery: ' + errorMsg);
+                console.error('Recovery error:', xhr.responseText);
+                const errorMsg = xhr.responseJSON?.message || 
+                               'Gagal terhubung ke server. Silakan coba lagi.';
+                showRecoveryModal('danger', errorMsg);
+            },
+            complete: function() {
                 button.prop('disabled', false)
                       .html('<i class="fas fa-sync-alt"></i> Recovery');
             }
@@ -86,35 +103,43 @@ function setupRecoveryButtons() {
     });
 }
 
-// Fungsi untuk update status perangkat
+// Fungsi untuk update status perangkat (optional)
 function updateDeviceStatus() {
-    $.get('/dashboard?partial=true', function(data) {
+    console.log('Updating device status...');
+    $.get(window.location.href, function(data) {
         const newContent = $(data).find('.table-responsive:last').html();
         $('.table-responsive:last').html(newContent);
+        setupRecoveryButtons(); // Re-init buttons setelah update
     });
 }
 
-// Inisialisasi
+// Inisialisasi dengan error handling
 $(document).ready(function() {
-    console.log('Recovery JS initialized');
-    setupRecoveryButtons();
-    
-    // MutationObserver untuk handle dynamic content
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.addedNodes.length) {
-                $(mutation.addedNodes).find('.recovery-btn').each(function() {
-                    if (!$(this).hasClass('initialized')) {
-                        setupRecoveryButtons();
-                        $(this).addClass('initialized');
+    try {
+        console.log('Recovery JS initialized');
+        setupRecoveryButtons();
+        
+        // MutationObserver untuk handle dynamic content
+        if (typeof MutationObserver !== 'undefined') {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        $(mutation.addedNodes).find('.recovery-btn').each(function() {
+                            if (!$(this).hasClass('initialized')) {
+                                setupRecoveryButtons();
+                                $(this).addClass('initialized');
+                            }
+                        });
                     }
                 });
-            }
-        });
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing recovery JS:', error);
+    }
 });

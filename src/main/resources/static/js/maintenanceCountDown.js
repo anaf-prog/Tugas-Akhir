@@ -4,16 +4,17 @@ let countdownInterval = null;
 // Fungsi untuk mengupdate semua countdown
 function updateAllCountdowns() {
     let allCompleted = true;
-    let activeCountdowns = 0;
     
     console.log("--- Running updateAllCountdowns ---");
     
+    // Update countdown untuk waktu mulai maintenance
     $('.scheduled-time').each(function(index) {
         const $container = $(this);
         const scheduledTimeStr = $container.attr('data-scheduled');
         const countdownElement = $container.find('.countdown');
+        const deviceId = $container.closest('tr').data('device-id');
         
-        console.log(`Processing element #${index}`, {
+        console.log(`Processing scheduled time for element #${index}`, {
             scheduledTimeStr: scheduledTimeStr,
             element: $container
         });
@@ -23,18 +24,10 @@ function updateAllCountdowns() {
             return;
         }
         
-        activeCountdowns++;
-        
         try {
             const scheduledDate = new Date(scheduledTimeStr);
             const now = new Date();
             const diffMs = scheduledDate - now;
-            
-            console.log(`Time comparison for element #${index}:`, {
-                scheduled: scheduledDate,
-                now: now,
-                diffMs: diffMs
-            });
             
             if (isNaN(diffMs)) {
                 console.error(`Invalid date calculation for element #${index}`);
@@ -44,8 +37,14 @@ function updateAllCountdowns() {
             if (diffMs <= 0) {
                 // Waktu maintenance sudah lewat
                 console.log(`Maintenance time reached for element #${index}`);
-                countdownElement.text('Waktu maintenance telah tiba');
+                countdownElement.text('Proses maintenance...');
                 countdownElement.removeClass('soon').addClass('completed');
+                
+                // Nonaktifkan perangkat jika diperlukan
+                if (deviceId && !countdownElement.hasClass('disabled')) {
+                    disableDevice(deviceId);
+                    countdownElement.addClass('disabled');
+                }
                 return;
             }
             
@@ -78,11 +77,83 @@ function updateAllCountdowns() {
             }
             
         } catch (e) {
-            console.error(`Error processing countdown for element #${index}:`, e);
+            console.error(`Error processing scheduled time for element #${index}:`, e);
         }
     });
     
-    console.log(`Active countdowns: ${activeCountdowns}, allCompleted: ${allCompleted}`);
+    // Update countdown untuk waktu selesai perbaikan
+    $('.repair-completion').each(function(index) {
+        const $container = $(this);
+        const completionTimeStr = $container.attr('data-completion');
+        const countdownElement = $container.find('.completion-countdown');
+        const deviceId = $container.closest('tr').data('device-id');
+        
+        console.log(`Processing repair completion for element #${index}`, {
+            completionTimeStr: completionTimeStr,
+            element: $container
+        });
+        
+        if (!completionTimeStr || completionTimeStr === 'null') {
+            console.log(`Skipping element #${index} - no completion time`);
+            return;
+        }
+        
+        try {
+            const completionDate = new Date(completionTimeStr);
+            const now = new Date();
+            const diffMs = completionDate - now;
+            
+            if (isNaN(diffMs)) {
+                console.error(`Invalid date calculation for element #${index}`);
+                return;
+            }
+            
+            if (diffMs <= 0) {
+                // Waktu perbaikan selesai
+                console.log(`Repair completion time reached for element #${index}`);
+                countdownElement.text('Perbaikan selesai');
+                countdownElement.removeClass('soon').addClass('completed');
+                
+                // Aktifkan perangkat jika diperlukan
+                if (deviceId && !countdownElement.hasClass('enabled')) {
+                    checkAndEnableDevice(deviceId);
+                    countdownElement.addClass('enabled');
+                }
+                return;
+            }
+            
+            // Jika masih ada yang belum selesai
+            allCompleted = false;
+            
+            // Hitung sisa waktu
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+            
+            // Format tampilan
+            let countdownText = '';
+            if (diffDays > 0) {
+                countdownText += diffDays + 'd ';
+            }
+            countdownText += diffHours.toString().padStart(2, '0') + ':' + 
+                             diffMinutes.toString().padStart(2, '0') + ':' + 
+                             diffSeconds.toString().padStart(2, '0');
+            
+            // Update element
+            countdownElement.text(countdownText);
+            
+            // Tambah class soon jika kurang dari 1 jam
+            if (diffMs < 3600000) {
+                countdownElement.addClass('soon');
+            } else {
+                countdownElement.removeClass('soon');
+            }
+            
+        } catch (e) {
+            console.error(`Error processing repair completion for element #${index}:`, e);
+        }
+    });
     
     // Hentikan interval jika semua countdown sudah selesai
     if (allCompleted && countdownInterval) {
@@ -90,6 +161,36 @@ function updateAllCountdowns() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
+}
+
+// Fungsi untuk mengecek dan mengaktifkan perangkat
+function checkAndEnableDevice(deviceId) {
+    console.log(`Checking if device ${deviceId} needs to be enabled`);
+    
+    $.ajax({
+        url: `/api/devices/${deviceId}/status`,
+        type: 'GET',
+        success: function(status) {
+            if (status === 'OFFLINE') {
+                console.log(`Device ${deviceId} is offline - attempting to enable`);
+                $.ajax({
+                    url: `/api/maintenance/device/${deviceId}/enable`,
+                    type: 'PUT',
+                    success: function(response) {
+                        console.log(`Device ${deviceId} enabled successfully`, response);
+                        showAlert('success', `Perangkat ${response.deviceId} berhasil diaktifkan kembali`);
+                    },
+                    error: function(xhr) {
+                        console.error(`Failed to enable device ${deviceId}`, xhr.responseJSON);
+                        showAlert('danger', `Gagal mengaktifkan perangkat ${deviceId}`);
+                    }
+                });
+            }
+        },
+        error: function(xhr) {
+            console.error(`Failed to check status for device ${deviceId}`, xhr.responseJSON);
+        }
+    });
 }
 
 // Fungsi untuk inisialisasi countdown
@@ -129,7 +230,7 @@ $(document).ready(function() {
     }
 });
 
-// Fungsi untuk disable device (pastikan ini ada)
+// Fungsi untuk disable device
 function disableDevice(deviceId) {
     console.log(`Attempting to disable device ${deviceId}`);
     $.ajax({
@@ -137,41 +238,11 @@ function disableDevice(deviceId) {
         type: 'PUT',
         success: function(response) {
             console.log(`Device ${deviceId} disabled successfully`, response);
-            showAlert('success', `Perangkat ${deviceId} berhasil dinonaktifkan`);
-            setTimeout(() => location.reload(), 2000);
+            showAlert('success', `Perangkat ${response.deviceId} berhasil dinonaktifkan`);
         },
         error: function(xhr) {
             console.error(`Failed to disable device ${deviceId}`, xhr.responseJSON);
             showAlert('danger', 'Gagal menonaktifkan perangkat');
-        }
-    });
-}
-
-// Fungsi untuk mengecek dan menonaktifkan perangkat
-function checkAndDisableCompleted() {
-    console.log('Checking for completed maintenance...');
-    $('.scheduled-time').each(function() {
-        const $container = $(this);
-        const scheduledTimeStr = $container.attr('data-scheduled');
-        const countdownElement = $container.find('.countdown');
-        
-        if (!scheduledTimeStr) return;
-        
-        try {
-            const scheduledDate = new Date(scheduledTimeStr);
-            const now = new Date();
-            const diffMs = scheduledDate - now;
-            
-            if (diffMs <= 0 && !countdownElement.hasClass('completed')) {
-                const deviceId = $container.closest('tr').data('device-id');
-                console.log(`Maintenance time reached for device ${deviceId}`);
-                if (deviceId) {
-                    disableDevice(deviceId);
-                }
-                countdownElement.addClass('completed');
-            }
-        } catch (e) {
-            console.error('Error checking maintenance completion:', e);
         }
     });
 }

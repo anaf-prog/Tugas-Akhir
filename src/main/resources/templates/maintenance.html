@@ -94,11 +94,12 @@
                             <table id="maintenanceTable" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
                                         <th>Nama Perangkat</th>
                                         <th>Deskripsi</th>
                                         <th>Teknisi</th>
                                         <th>Jadwal Maintenance</th>
+                                        <th>Waktu Selesai Maintenance</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -125,7 +126,7 @@
                                             </div>
                                         </td> -->
 
-
+                                        <!-- Jadwal Perbaikan -->
                                         <td>
                                             <span th:if="${log.scheduledTime != null}">
                                                 <div class="scheduled-time" 
@@ -138,6 +139,21 @@
                                             </span>
                                             <span th:if="${log.scheduledTime == null}">-</span>
                                             <div th:if="${log.autoDisable}" class="badge bg-warning mt-1">Maintenance</div>
+                                        </td>
+
+                                        <!-- Selesai Perbaikan -->
+                                        <td>
+                                            <span th:if="${log.repairCompletionTime != null}">
+                                                <div class="repair-completion" 
+                                                    th:data-completion="${#temporals.format(log.repairCompletionTime, 'yyyy-MM-dd HH:mm:ss')}"
+                                                    th:data-device-id="${log.device != null} ? ${log.device.id} : ''">
+                                                    <span class="completion-countdown"></span>
+                                                    <small class="text-muted d-block">
+                                                        (<span th:text="${#temporals.format(log.repairCompletionTime, 'dd-MM-yyyy HH:mm')}"></span>)
+                                                    </small>
+                                                </div>
+                                            </span>
+                                            <span th:if="${log.repairCompletionTime == null}">-</span>
                                         </td>
 
                                         <td>

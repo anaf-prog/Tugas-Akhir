@@ -15,27 +15,39 @@
                             <!-- Options akan diisi via JavaScript -->
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="maintenanceDate" class="form-label">Tanggal Pemeliharaan</label>
                         <input type="datetime-local" class="form-control" id="maintenanceDate" name="maintenanceDate" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="scheduledTime" class="form-label">Jadwal Maintenance</label>
                         <input type="datetime-local" class="form-control" id="scheduledTime" name="scheduledTime">
                         <small class="text-muted">Kosongkan jika maintenance dilakukan sekarang</small>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="repairCompletionTime" class="form-label">Selesai Perbaikan</label>
+                        <input type="datetime-local" class="form-control" id="repairCompletionTime" name="repairCompletionTime">
+                        <small class="text-muted">Isi jika perangkat akan diaktifkan kembali otomatis</small>
+                    </div>
+
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="autoDisable" name="autoDisable">
                         <label class="form-check-label" for="autoDisable">Auto-disable perangkat saat waktu maintenance</label>
                     </div>
+
                     <div class="mb-3">
                         <label for="technician" class="form-label">Teknisi</label>
                         <input type="text" class="form-control" id="technician" name="technician" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="description" class="form-label">Deskripsi Pemeliharaan</label>
                         <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

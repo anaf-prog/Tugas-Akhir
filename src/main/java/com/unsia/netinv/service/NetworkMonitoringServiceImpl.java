@@ -4,7 +4,9 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -23,6 +25,8 @@ import com.unsia.netinv.netinve.LogReason;
 import com.unsia.netinv.repository.DeviceRepository;
 import com.unsia.netinv.repository.FailOverLogRepository;
 import com.unsia.netinv.repository.MonitoringLogRepository;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
@@ -50,58 +54,172 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     @Autowired
     private FailOverLogRepository failOverLogRepository;
 
+    private final Map<Long, Boolean> lastKnownStatus = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void init() {
+        // Initialize last known status saat aplikasi mulai
+        List<Device> devices = deviceRepository.findAll();
+        devices.forEach(device -> 
+            lastKnownStatus.put(device.getId(), "ONLINE".equals(device.getStatusDevice())));
+    }
+
     @Override
-    @Scheduled(fixedRate = 60000) 
+    @Scheduled(fixedRate = 60000)
     public void monitoringAlldevices() {
         List<Device> devices = deviceRepository.findAll();
-        System.out.println("Starting monitoring for {} devices ..." + devices.size());
+        System.out.println("Starting monitoring for " + devices.size() + " devices...");
 
+        // Check for manual changes first
+        checkForManualStatusChanges();
+
+        // Continue normal monitoring
         for (Device device : devices) {
-            try {
-                boolean isOnline = pingService.pingDevice(device.getIpAddress());
-                Long responseTime = pingService.pingWithResponseTime(device.getIpAddress());
-                String newStatus = isOnline ? "ONLINE" : "OFFLINE";
-                boolean statusChanged = !device.getStatusDevice().equalsIgnoreCase(newStatus);
-                boolean isAnomaly = isResponseTimeAnomaly(responseTime);
-                
-                if (statusChanged) {
-                    device.setStatusDevice(newStatus);
-                    deviceRepository.save(device);
-                    
-                    // Gunakan DOWN atau RECOVERED berdasarkan status
-                    LogReason reason = isOnline ? LogReason.RECOVERED : LogReason.DOWN;
-                    createNewLog(device, isOnline, responseTime, reason);
-                    
-                    if (!isOnline) {
-                        try {
-                            failoverService.activateBackupRoute(device.getId());
-                            emailNotificationService.sendDeviceDownNotification(device,"Sistem telah melakukan failover otomatis ke perangkat cadangan");
-                            dashboardNotificationService.sendDeviceDownNotification(device, "Perangkat down! Sistem melakukan failover otomatis");
-                        } catch (Exception e) {
-                            System.out.println("Gagal failover untuk perangkat " + device.getDeviceName() + e.getMessage());
-                        } 
-                    } else {
-                        dashboardNotificationService.sendDeviceRecoveredNotification(device, "Perangkat kembali online");
-                    }
-                } else if (isAnomaly) {
-                    createNewLog(device, isOnline, responseTime, LogReason.HIGH_LATENCY);
-                } else {
-                    updateLastLog(device, isOnline, responseTime);
-                }
-                
-                // logger.info("Device {} ({}): Status {} - Response Time {} ms",
-                //     device.getDeviceName(), device.getIpAddress(), 
-                //     newStatus,
-                //     responseTime != null ? responseTime : "N/A");
+            monitorSingleDevice(device);
+        }
+    }
 
-                // System.out.println("Device {} ({}): Status {} - Response Time {} ms" +
-                //     device.getDeviceName() + device.getIpAddress() + 
-                //     newStatus +
-                //     responseTime != null ? responseTime : "N/A"); 
-
-            } catch (Exception e) {
-                System.out.println("Error monitoring device {}: {}" + device.getDeviceName() + e.getMessage());
+    // Memeriksa perubahan status manual di database
+    private void checkForManualStatusChanges() {
+        List<Device> devices = deviceRepository.findAll();
+        for (Device device : devices) {
+            Boolean lastStatus = lastKnownStatus.get(device.getId());
+            boolean currentStatus = "ONLINE".equals(device.getStatusDevice());
+            
+            if (lastStatus != null && lastStatus != currentStatus) {
+                System.out.println("Manual status change detected for device: " + device.getDeviceName());
+                handleManualStatusChange(device, currentStatus);
             }
+            
+            // Update last known status
+            lastKnownStatus.put(device.getId(), currentStatus);
+        }
+    }
+
+    // Menangani perubahan status manual
+    private void handleManualStatusChange(Device device, boolean newStatus) {
+        String currentStatus = device.getStatusDevice();
+
+        // Periksa apakah device dalam status maintenance
+        if ("MAINTENANCE".equals(currentStatus) && newStatus) {
+            device.setStatusDevice("ONLINE");
+            deviceRepository.saveAndFlush(device);
+
+            // Maintenance selesai
+            createNewLog(device, true, null, LogReason.MAINTENANCE_END);
+            dashboardNotificationService.sendMaintenanceEndNotification(
+                device, "Pemeliharaan perangkat telah selesai");
+            emailNotificationService.sendMaintenanceEndNotification(
+                device, "Pemeliharaan perangkat telah selesai");
+            return;
+        }
+
+        // Skip jika dalam maintenance dan akan dimatikan
+        if ("MAINTENANCE".equals(currentStatus) && !newStatus) {
+            return;
+        }
+
+        LogReason reason = newStatus ? LogReason.DOWN : LogReason.RECOVERED;
+        createNewLog(device, newStatus, null, reason);
+        
+        if (!newStatus) {
+            // Skip failover jika dalam maintenance
+            if (!"MAINTENANCE".equals(device.getStatusDevice())) {
+                triggerDownNotifications(device);
+            }
+        } else {
+            dashboardNotificationService.sendDeviceRecoveredNotification(
+                device, "Perangkat sudah kembali normal");
+        }
+    }
+
+    // Memonitor status single device dengan ping
+    private void monitorSingleDevice(Device device) {
+        try {
+            boolean isOnline = pingService.pingDevice(device.getIpAddress());
+            Long responseTime = pingService.pingWithResponseTime(device.getIpAddress());
+            
+            // System.out.println("Monitoring " + device.getIpAddress() + 
+            //     " - DB Status: " + device.getStatusDevice() + 
+            //     ", Ping: " + isOnline);
+
+            handleDeviceStatus(device, isOnline, responseTime);
+            
+        } catch (Exception e) {
+            System.out.println("Error monitoring device " + device.getDeviceName() + 
+                ": " + e.getMessage());
+        }
+    }
+
+    // Menangani perubahan status device
+    private void handleDeviceStatus(Device device, boolean isOnline, Long responseTime) {
+        String newStatus = isOnline ? "ONLINE" : "OFFLINE";
+        boolean statusChanged = !newStatus.equals(device.getStatusDevice());
+        
+        if (statusChanged) {
+            updateDeviceStatus(device, newStatus, isOnline, responseTime);
+        } else if (isResponseTimeAnomaly(responseTime)) {
+            createNewLog(device, isOnline, responseTime, LogReason.HIGH_LATENCY);
+        } else {
+            updateLastLog(device, isOnline, responseTime);
+        }
+    }
+
+    // Update status device di database
+    private void updateDeviceStatus(Device device, String newStatus, boolean isOnline, Long responseTime) {
+        // Simpan status sebelumnya
+        String previousStatus = device.getStatusDevice();
+        
+        device.setStatusDevice(newStatus);
+        deviceRepository.saveAndFlush(device); // Force immediate commit
+        
+        LogReason reason = isOnline ? LogReason.RECOVERED : LogReason.DOWN;
+        createNewLog(device, isOnline, responseTime, reason);
+        
+        if (isOnline) {
+            dashboardNotificationService.sendDeviceRecoveredNotification(
+                device, "Perangkat kembali online");
+        } else {
+            // Skip jika sebelumnya MAINTENANCE
+            if (!"MAINTENANCE".equals(previousStatus)) {
+                triggerDownNotifications(device);
+            }
+        }
+        
+        // Update last known status
+        lastKnownStatus.put(device.getId(), isOnline);
+    }
+
+    // Trigger notifikasi ketika device down
+    private void triggerDownNotifications(Device device) {
+        // Dapatkan status terbaru dari database
+        Device refreshedDevice = deviceRepository.findById(device.getId()).orElse(device);
+
+        // Periksa apakah ini maintenance
+        if ("MAINTENANCE".equals(refreshedDevice.getStatusDevice())) {
+            emailNotificationService.sendMaintenanceNotification(
+                device, "Perangkat sedang dalam pemeliharaan");
+            dashboardNotificationService.sendMaintenanceNotification(
+                device, "Perangkat sedang dalam pemeliharaan");
+            return;
+        }
+
+         // Lanjutkan dengan failover hanya jika bukan maintenance
+        try {
+            failoverService.activateBackupRoute(device.getId());
+            System.out.println("Berhasil aktifkan perangkat back up " + device.getDeviceName() + " dengan ID : " + device.getId());
+            
+            emailNotificationService.sendDeviceDownNotification(device,
+                "Sistem telah melakukan failover otomatis ke perangkat cadangan");
+            dashboardNotificationService.sendDeviceDownNotification(device,
+                "Sistem telah melakukan failover otomatis ke perangkat cadangan");
+        } catch (Exception e) {
+            System.out.println("Failover failed for " + device.getDeviceName() + ": " + e.getMessage());
+            
+            emailNotificationService.sendDeviceDownNotification(device,
+                "Gagal melakukan failover otomatis");
+            dashboardNotificationService.sendDeviceDownNotification(device,
+                "Gagal melakukan failover otomatis");
         }
     }
 
@@ -127,6 +245,7 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
         System.out.println("Created NEW log for device {} with reason {}" + device.getDeviceName() + reason);
     }
 
+    // Update log terakhir jika ada
     private void updateLastLog(Device device, boolean isOnline, Long responseTime) {
         @SuppressWarnings("unused")
         Pageable latest = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "monitoring"));
@@ -160,6 +279,7 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
         return deviceRepository.findByStatusDevice("OFFLINE");
     }
 
+    // Mendapatkan log monitoring terbaru
     @Override
     public List<MonitoringLog> getLatestMonitoringLogs(int count) {
         List<Device> devices = deviceRepository.findAll();
@@ -177,6 +297,7 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
         return latestLogs.stream().limit(count).collect(Collectors.toList());
     }
 
+    // Update waktu perbaikan failover
     @Override
     public void updateFailoverRepairTime(Device device, Date repairDate) {
         // Cari failover terakhir yang belum diperbaiki

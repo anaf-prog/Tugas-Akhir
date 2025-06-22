@@ -1,10 +1,12 @@
 package com.unsia.netinv.service;
 
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,12 +89,13 @@ public class ReportServiceImpl implements ReportService {
     public Map<String, Object> getReportPageData(Users user) {
         Map<String, Object> data = new HashMap<>();
 
-        monitoringLogRepository.setDefaultLogReason(LogReason.MAINTENANCE);
-
         List<Report> reports = reportRepository.findAllByOrderByIssueDateDesc();
         List<Device> devices = deviceRepository.findAll();
-        List<MonitoringLog> monitoringLogs = monitoringLogRepository.findAllByOrderByMonitoringDesc();
 
+        List<MonitoringLog> allLogs = monitoringLogRepository.findAllByOrderByMonitoringDesc();
+
+        // Proses untuk menentukan logReason yang benar
+        processLogReasons(allLogs);
         data.put("formatDate", new Object() {
             @SuppressWarnings("unused")
             public String apply(Date date) {
@@ -104,9 +107,52 @@ public class ReportServiceImpl implements ReportService {
         data.put("userRole", user.getRole());
         data.put("reports", reports);
         data.put("devices", devices);
-        data.put("monitoringLogs", monitoringLogs);
+        data.put("monitoringLogs", allLogs);
 
         return data;
+    }
+
+    /**
+     * Method untuk memproses dan mengupdate logReason berdasarkan status ping dan log sebelumnya
+     */
+    private void processLogReasons(List<MonitoringLog> logs) {
+        // Kelompokkan log berdasarkan device
+        Map<Device, List<MonitoringLog>> logsByDevice = logs.stream()
+            .collect(Collectors.groupingBy(MonitoringLog::getDevice));
+        
+        // Proses setiap device
+        for (Map.Entry<Device, List<MonitoringLog>> entry : logsByDevice.entrySet()) {
+            List<MonitoringLog> deviceLogs = entry.getValue();
+            
+            // Urutkan secara ascending (dari yang terlama ke terbaru)
+            deviceLogs.sort(Comparator.comparing(MonitoringLog::getMonitoring));
+            
+            // Proses setiap log untuk device ini
+            for (int i = 0; i < deviceLogs.size(); i++) {
+                MonitoringLog currentLog = deviceLogs.get(i);
+                
+                if (currentLog.getPingStatus()) { // Jika status UP
+                    if (i > 0) {
+                        MonitoringLog previousLog = deviceLogs.get(i - 1);
+                        if (!previousLog.getPingStatus()) {
+                            // Jika sebelumnya DOWN, sekarang UP → RECOVERED
+                            currentLog.setLogReason(LogReason.RECOVERED);
+                        } else {
+                            // Jika sebelumnya UP, sekarang tetap UP → NORMAL
+                            currentLog.setLogReason(LogReason.NORMAL);
+                        }
+                    } else {
+                        // Jika tidak ada log sebelumnya, asumsikan NORMAL
+                        currentLog.setLogReason(LogReason.NORMAL);
+                    }
+                } else { // Jika status DOWN
+                    currentLog.setLogReason(LogReason.DOWN);
+                }
+                
+                // Simpan perubahan ke database
+                monitoringLogRepository.save(currentLog);
+            }
+        }
     }
 
     @Override

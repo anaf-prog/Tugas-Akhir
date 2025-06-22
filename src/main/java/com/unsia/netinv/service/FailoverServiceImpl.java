@@ -33,46 +33,58 @@ public class FailoverServiceImpl implements FailoverService {
     public void activateBackupRoute(Long mainDeviceId) {
 
         try {
-            BackupRoutes backupRoute = backupRouteRepository.findByMainDeviceId(mainDeviceId)
-                .orElseThrow(() -> new RuntimeException("Tidak ada rute cadangan untuk perangkat ID : " + mainDeviceId));
-
             Device mainDevice = deviceRepository.findById(mainDeviceId)
                 .orElseThrow(() -> new RuntimeException("Perangkat utama tidak ditemukan!"));
+
+            // 1. Cek apakah ini maintenance, jika ya, tidak perlu failover
+            if ("MAINTENANCE".equals(mainDevice.getStatusDevice())) {
+                logger.info("Perangkat {} dalam status MAINTENANCE, skip failover", 
+                    mainDevice.getDeviceName());
+                return;
+            }
+
+            // 2. Cek apakah perangkat utama benar-benar offline
+            if (!"OFFLINE".equals(mainDevice.getStatusDevice())) {
+                logger.info("Perangkat utama {} tidak offline, skip failover", 
+                    mainDevice.getDeviceName());
+                return;
+            }
+
+            // 3. Cari rute cadangan
+            BackupRoutes backupRoute = backupRouteRepository.findByMainDeviceId(mainDeviceId)
+                .orElseThrow(() -> new RuntimeException("Tidak ada rute cadangan untuk perangkat ID: " + mainDeviceId));
 
             Device backupDevice = deviceRepository.findById(backupRoute.getBackupDevice().getId())
                 .orElseThrow(() -> new RuntimeException("Perangkat cadangan tidak ditemukan"));
 
-            // Pastikan perangkat utama benar-benar offline
-            if (!"OFFLINE".equals(mainDevice.getStatusDevice())) {
-                logger.info("Perangkat utama {} tidak offline, skip failover", mainDevice.getDeviceName());
-                return;
-            }
-
-            // Aktifkan backup
+            // 4. Aktifkan backup
             backupDevice.setStatusDevice("ONLINE");
             deviceRepository.save(backupDevice);
 
-            // Update status backup route
+            // 5. Update status backup route
             backupRoute.setIsActive(true);
             backupRouteRepository.save(backupRoute);
 
-            // Buat log
-            FailOverLogs log = new FailOverLogs();
-            log.setWaktu(new Date());
-            log.setMainDevice(mainDevice);
-            log.setBackupDevice(backupDevice);
-            log.setStatus("SUCCESS");
-            log.setResponseTimeMs(calculateResponseTime(backupDevice));
-            failOverLogRepository.save(log);
+            // 6. Buat log failover
+            createFailoverLog(mainDevice, backupDevice, "SUCCESS");
 
             logger.info("Failover diaktifkan: {} -> {}", 
                 mainDevice.getDeviceName(), backupDevice.getDeviceName());
 
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("Gagal mengaktifkan rute cadangan: {}", e.getMessage());
             throw new RuntimeException("Gagal mengaktifkan rute cadangan: " + e.getMessage());
         }
+    }
+
+    private void createFailoverLog(Device mainDevice, Device backupDevice, String status) {
+        FailOverLogs log = new FailOverLogs();
+        log.setWaktu(new Date());
+        log.setMainDevice(mainDevice);
+        log.setBackupDevice(backupDevice);
+        log.setStatus(status);
+        log.setResponseTimeMs(calculateResponseTime(backupDevice));
+        failOverLogRepository.save(log);
     }
 
     // Method untuk menghitung response time (contoh sederhana)

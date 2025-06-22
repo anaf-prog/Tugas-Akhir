@@ -18,22 +18,28 @@ public class DashboardNotificationServiceImpl implements DashboardNotificationSe
 
     @Override
     public void sendDeviceDownNotification(Device device, String message) {
-        Map<String, Object> notification = new LinkedHashMap<>();
-        notification.put("type", "DEVICE_DOWN");
-        notification.put("deviceId", device.getId());
-        notification.put("deviceName", device.getDeviceName());
-        notification.put("ipAddress", device.getIpAddress());
-        notification.put("message", message);
-        notification.put("timestamp", new Date());
-
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-
+        sendNotification(device, message, "DEVICE_DOWN");
     }
 
     @Override
     public void sendDeviceRecoveredNotification(Device device, String message) {
+        sendNotification(device, message, "DEVICE_RECOVERED");
+    }
+
+    @Override
+    public void sendMaintenanceNotification(Device device, String message) {
+        sendNotification(device, message, "MAINTENANCE_START");
+    }
+
+    @Override
+    public void sendMaintenanceEndNotification(Device device, String message) {
+        sendNotification(device, message, "MAINTENANCE_END");
+    }
+
+    // Method helper untuk menghindari duplikasi kode
+    private void sendNotification(Device device, String message, String type) {
         Map<String, Object> notification = new LinkedHashMap<>();
-        notification.put("type", "DEVICE_RECOVERED");
+        notification.put("type", type);
         notification.put("deviceId", device.getId());
         notification.put("deviceName", device.getDeviceName());
         notification.put("ipAddress", device.getIpAddress());

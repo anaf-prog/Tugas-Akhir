@@ -4,31 +4,31 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.unsia.netinv.entity.Device;
+import com.unsia.netinv.repository.DeviceRepository;
+
 
 @Service
 public class PingServiceImpl implements PingService {
 
+    @Autowired
+    private DeviceRepository deviceRepository;
+
+    @SuppressWarnings("unused")
     private final Map<String, Boolean> deviceStatusSimulation = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
-    public void init() {
-        // Inisialisasi status perangkat dummy
-        deviceStatusSimulation.put("192.168.1.1", true);
-        deviceStatusSimulation.put("192.168.1.2", true);  
-        deviceStatusSimulation.put("192.168.1.3", true);  
-        deviceStatusSimulation.put("192.168.1.4", true);  
-        deviceStatusSimulation.put("192.168.1.5", true);  
-        deviceStatusSimulation.put("192.168.1.6", true);  
-        deviceStatusSimulation.put("192.168.1.7", true);  
-        
-        deviceStatusSimulation.put("192.168.1.6", random.nextDouble() > 0.2);
-        deviceStatusSimulation.put("192.168.1.5", random.nextDouble() > 0.1); 
-    }
-
     @Override
     public boolean pingDevice(String ipAddress) {
-        return deviceStatusSimulation.getOrDefault(ipAddress, true);
+        // Selalu baca status terbaru dari database
+        Device device = deviceRepository.findByIpAddress(ipAddress);
+        if (device == null) {
+            return false; // Jika device tidak ditemukan, anggap offline
+        }
+        return "ONLINE".equalsIgnoreCase(device.getStatusDevice());
     }
 
     @Override
@@ -42,7 +42,12 @@ public class PingServiceImpl implements PingService {
 
     @Override
     public void forceFailure(String ipAddress, boolean shouldFail) {
-        deviceStatusSimulation.put(ipAddress, !shouldFail);
+        // Update database langsung
+        Device device = deviceRepository.findByIpAddress(ipAddress);
+        if (device != null) {
+            device.setStatusDevice(shouldFail ? "OFFLINE" : "ONLINE");
+            deviceRepository.save(device);
+        }
     }
     
 }

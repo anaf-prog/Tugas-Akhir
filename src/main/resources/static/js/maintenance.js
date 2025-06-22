@@ -49,7 +49,8 @@ $(document).ready(function() {
             scheduledTime: $('#scheduledTime').val(),
             autoDisable: $('#autoDisable').is(':checked'),
             technician: $('#technician').val(),
-            description: $('#description').val()
+            description: $('#description').val(),
+            repairCompletionTime: $('#repairCompletionTime').val()
         };
         
         // Validasi frontend
@@ -71,6 +72,11 @@ $(document).ready(function() {
         }
         if (formData.autoDisable && !formData.scheduledTime) {
             showAlert('danger', 'Harap isi jadwal maintenance jika ingin mengaktifkan auto-disable');
+            return;
+        }
+        if (formData.autoDisable && formData.repairCompletionTime && 
+            new Date(formData.repairCompletionTime) <= new Date(formData.scheduledTime)) {
+            showAlert('danger', 'Waktu selesai perbaikan harus setelah waktu mulai maintenance');
             return;
         }
         

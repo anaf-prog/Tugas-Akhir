@@ -33,6 +33,10 @@ public class MaintenanceLog {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime scheduledTime;
 
+    @Column(name = "repair_completion_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime repairCompletionTime;
+
     @Column(name = "auto_disable")
     private Boolean autoDisable = false;
 

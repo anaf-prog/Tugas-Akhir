@@ -25,4 +25,6 @@ public class MaintenanceLogRequest {
     @NotBlank(message = "Deskripsi tidak boleh kosong")
     private String description;
 
+    private String repairCompletionTime;
+
 }

@@ -29,9 +29,11 @@ import com.unsia.netinv.dto.MaintenanceLogRequest;
 import com.unsia.netinv.entity.Device;
 import com.unsia.netinv.entity.MaintenanceLog;
 import com.unsia.netinv.entity.MonitoringLog;
+import com.unsia.netinv.netinve.LogReason;
 import com.unsia.netinv.repository.DeviceRepository;
 import com.unsia.netinv.repository.MaintenanceLogRepository;
 import com.unsia.netinv.repository.MonitoringLogRepository;
+import com.unsia.netinv.service.EmailNotificationService;
 import com.unsia.netinv.utility.MaintenanceScheduler;
 
 @RestController
@@ -49,6 +51,9 @@ public class MaintenanceApiController {
 
     @Autowired
     private MonitoringLogRepository monitoringLogRepository;
+
+    @Autowired
+    private EmailNotificationService emailNotificationService;
 
     MaintenanceApiController(MaintenanceScheduler maintenanceScheduler) {
         this.maintenanceScheduler = maintenanceScheduler;
@@ -100,6 +105,17 @@ public class MaintenanceApiController {
                 log.info("Setting scheduled time to: {}", scheduledTime);
             }
 
+            // Handle repair completion time
+            if (request.getRepairCompletionTime() != null && !request.getRepairCompletionTime().isEmpty()) {
+                LocalDateTime completionTime = LocalDateTime.parse(request.getRepairCompletionTime());
+                maintenanceLog.setRepairCompletionTime(completionTime);
+
+                if (maintenanceLog.getScheduledTime() != null && completionTime.isBefore(maintenanceLog.getScheduledTime())) {
+                   return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message", "Waktu selesai harus setelah waktu mulai maintenance")); 
+                }
+            }
+
             // Simpan dan dapatkan response sederhana
             MaintenanceLog savedLog = maintenanceLogRepository.save(maintenanceLog);
 
@@ -122,6 +138,59 @@ public class MaintenanceApiController {
         }
     }
 
+    @PutMapping("/device/{id}/enable")
+    public ResponseEntity<?> enableDevice(@PathVariable Long id) {
+        log.info("Attempting to enable device ID: {}", id);
+        try {
+            Optional<Device> deviceOpt = deviceRepository.findById(id);
+            if (!deviceOpt.isPresent()) {
+                log.warn("Device not found with ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            
+            Device device = deviceOpt.get();
+
+            // Khusus jika sebelumnya MAINTENANCE, buat log MAINTENANCE_END
+            if ("MAINTENANCE".equals(device.getStatusDevice())) {
+                MonitoringLog endLog = new MonitoringLog();
+                endLog.setDevice(device);
+                endLog.setPingStatus(true);
+                endLog.setMonitoring(new Date());
+                endLog.setLogReason(LogReason.MAINTENANCE_END);
+                monitoringLogRepository.save(endLog);
+                
+                // Kirim notifikasi maintenance selesai
+                emailNotificationService.sendMaintenanceEndNotification(
+                    device, "Pemeliharaan perangkat telah selesai");
+            }
+
+            device.setStatusDevice("ONLINE");
+            device.setLastChecked(new Date());
+            Device savedDevice = deviceRepository.saveAndFlush(device);
+            
+            // Create monitoring log
+            MonitoringLog monitoringLog = new MonitoringLog();
+            monitoringLog.setDevice(device);
+            monitoringLog.setPingStatus(true);
+            monitoringLog.setMonitoring(new Date());
+            monitoringLogRepository.save(monitoringLog);
+            
+            log.info("Device successfully enabled. New status: {}", savedDevice.getStatusDevice());
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Perangkat berhasil diaktifkan",
+                "deviceId", savedDevice.getId(),
+                "status", savedDevice.getStatusDevice()
+            ));
+        } catch (Exception e) {
+            log.error("Error enabling device ID: {}", id, e);
+            return ResponseEntity.internalServerError().body(Map.of(
+                "message", "Gagal mengaktifkan perangkat",
+                "error", e.getMessage()
+            ));
+        }
+    }
+
     @PutMapping("/device/{id}/disable")
     public ResponseEntity<?> disableDevice(@PathVariable Long id) {
         log.info("Attempting to disable device ID: {}", id);
@@ -135,7 +204,7 @@ public class MaintenanceApiController {
             Device device = deviceOpt.get();
             log.info("Device current status: {}", device.getStatusDevice());
             
-            device.setStatusDevice("OFFLINE");
+            device.setStatusDevice("MAINTENANCE");
             device.setLastChecked(new Date());
             Device savedDevice = deviceRepository.save(device);
             
@@ -144,19 +213,20 @@ public class MaintenanceApiController {
             monitoringLog.setDevice(device);
             monitoringLog.setPingStatus(false);
             monitoringLog.setMonitoring(new Date());
+            monitoringLog.setLogReason(LogReason.MAINTENANCE);
             monitoringLogRepository.save(monitoringLog);
             
-            log.info("Device successfully disabled. New status: {}", savedDevice.getStatusDevice());
+            log.info("Device successfully set to maintenance. New status: {}", savedDevice.getStatusDevice());
             
             return ResponseEntity.ok(Map.of(
-                "message", "Perangkat berhasil dinonaktifkan",
+                "message", "Perangkat berhasil dinonaktifkan untuk pemeliharaan",
                 "deviceId", savedDevice.getId(),
                 "status", savedDevice.getStatusDevice()
             ));
         } catch (Exception e) {
             log.error("Error disabling device ID: {}", id, e);
             return ResponseEntity.internalServerError().body(Map.of(
-                "message", "Gagal menonaktifkan perangkat",
+                "message", "Gagal menonaktifkan perangkat untuk pemeliharaan",
                 "error", e.getMessage()
             ));
         }

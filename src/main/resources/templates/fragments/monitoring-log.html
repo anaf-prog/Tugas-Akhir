@@ -59,7 +59,18 @@
                             <td th:text="${log.responseTime} ?: '-'">-</td>
                             <td th:text="${log.monitoring != null} ? ${#dates.format(log.monitoring, 'dd-MM-yyyy HH:mm:ss')} : '-'"></td>
 
-                            <td>
+                             <td>
+                                <!-- Tampilkan keterangan berdasarkan logReason -->
+                                <span th:if="${log.pingStatus}">
+                                    <span th:if="${log.logReason == T(com.unsia.netinv.netinve.LogReason).RECOVERED}" 
+                                          class="badge bg-success">Recovered</span>
+                                    <span th:if="${log.logReason == T(com.unsia.netinv.netinve.LogReason).NORMAL}" 
+                                          class="badge bg-primary">Normal</span>
+                                </span>
+                                <span th:unless="${log.pingStatus}" class="badge bg-danger">Down</span>
+                            </td>
+                            
+                            <!-- <td>
                                 <span th:switch="${log.logReason != null ? log.logReason : T(com.unsia.netinv.netinve.LogReason).MAINTENANCE}">
                                     <span th:case="${T(com.unsia.netinv.netinve.LogReason).NORMAL}" class="badge bg-primary">Normal</span>
                                     <span th:case="${T(com.unsia.netinv.netinve.LogReason).DOWN}" class="badge bg-danger">Down</span>
@@ -68,7 +79,7 @@
                                     <span th:case="${T(com.unsia.netinv.netinve.LogReason).MAINTENANCE}" class="badge bg-secondary">Maintenance</span>
                                     <span th:case="*" class="badge bg-secondary" th:text="${log.logReason.displayName}"></span>
                                 </span>
-                            </td>
+                            </td> -->
 
                             <!-- <td>
                                 <span th:switch="${log.logReason}">

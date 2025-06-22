@@ -5,7 +5,8 @@ public enum LogReason {
     HIGH_LATENCY("High Latency"),
     NORMAL("Normal"),
     RECOVERED("Recovered"),
-    MAINTENANCE("Maintenance");
+    MAINTENANCE("Maintenance"),
+    MAINTENANCE_END("Maintenance End");
 
     private final String displayName;
 
