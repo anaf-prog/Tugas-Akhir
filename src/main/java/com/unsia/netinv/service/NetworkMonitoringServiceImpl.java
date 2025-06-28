@@ -83,6 +83,11 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     private void checkForManualStatusChanges() {
         List<Device> devices = deviceRepository.findAll();
         for (Device device : devices) {
+            // Skip jika device dalam maintenance
+            if ("MAINTENANCE".equals(device.getStatusDevice())) {
+                continue;
+            }
+            
             Boolean lastStatus = lastKnownStatus.get(device.getId());
             boolean currentStatus = "ONLINE".equals(device.getStatusDevice());
             
@@ -136,6 +141,12 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
     // Memonitor status single device dengan ping
     private void monitorSingleDevice(Device device) {
         try {
+            // Skip monitoring jika device dalam maintenance
+            if ("MAINTENANCE".equals(device.getStatusDevice())) {
+                System.out.println("Skipping monitoring for device in maintenance: " + device.getDeviceName());
+                return;
+            }
+
             boolean isOnline = pingService.pingDevice(device.getIpAddress());
             Long responseTime = pingService.pingWithResponseTime(device.getIpAddress());
             
@@ -153,6 +164,11 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
 
     // Menangani perubahan status device
     private void handleDeviceStatus(Device device, boolean isOnline, Long responseTime) {
+        // Jangan update status jika device dalam maintenance
+        if ("MAINTENANCE".equals(device.getStatusDevice())) {
+            return;
+        }
+
         String newStatus = isOnline ? "ONLINE" : "OFFLINE";
         boolean statusChanged = !newStatus.equals(device.getStatusDevice());
         
@@ -167,6 +183,11 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
 
     // Update status device di database
     private void updateDeviceStatus(Device device, String newStatus, boolean isOnline, Long responseTime) {
+        // Jangan update status jika device dalam maintenance
+        if ("MAINTENANCE".equals(device.getStatusDevice())) {
+            return;
+        }
+
         // Simpan status sebelumnya
         String previousStatus = device.getStatusDevice();
         

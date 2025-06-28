@@ -57,6 +57,7 @@
                                 <td>
                                     <span class="badge bg-success" th:if="${device.statusDevice == 'ONLINE'}">Aktif</span>
                                     <span class="badge bg-danger" th:if="${device.statusDevice == 'OFFLINE'}">Down</span>
+                                    <span class="badge bg-warning" th:if="${device.statusDevice == 'MAINTENANCE'}">Maintenance</span>
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">

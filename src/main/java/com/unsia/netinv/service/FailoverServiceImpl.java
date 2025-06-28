@@ -33,8 +33,8 @@ public class FailoverServiceImpl implements FailoverService {
     public void activateBackupRoute(Long mainDeviceId) {
 
         try {
-            Device mainDevice = deviceRepository.findById(mainDeviceId)
-                .orElseThrow(() -> new RuntimeException("Perangkat utama tidak ditemukan!"));
+            Device mainDevice = deviceRepository.findByIdWithLock(mainDeviceId)
+                .orElseThrow(() -> new RuntimeException("Perangkat utama tidak ditemukan!"));  
 
             // 1. Cek apakah ini maintenance, jika ya, tidak perlu failover
             if ("MAINTENANCE".equals(mainDevice.getStatusDevice())) {

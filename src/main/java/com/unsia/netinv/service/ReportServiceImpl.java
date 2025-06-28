@@ -122,6 +122,7 @@ public class ReportServiceImpl implements ReportService {
         
         // Proses setiap device
         for (Map.Entry<Device, List<MonitoringLog>> entry : logsByDevice.entrySet()) {
+            Device device = entry.getKey();
             List<MonitoringLog> deviceLogs = entry.getValue();
             
             // Urutkan secara ascending (dari yang terlama ke terbaru)
@@ -146,7 +147,12 @@ public class ReportServiceImpl implements ReportService {
                         currentLog.setLogReason(LogReason.NORMAL);
                     }
                 } else { // Jika status DOWN
-                    currentLog.setLogReason(LogReason.DOWN);
+                    // Cek apakah device dalam status maintenance
+                    if ("MAINTENANCE".equalsIgnoreCase(device.getStatusDevice())) {
+                        currentLog.setLogReason(LogReason.MAINTENANCE);
+                    } else {
+                        currentLog.setLogReason(LogReason.DOWN);
+                    }
                 }
                 
                 // Simpan perubahan ke database

@@ -98,7 +98,7 @@ public class MaintenanceScheduler {
             logger.info("Current device status before disable: {}", device.getStatusDevice());
             
             // Update status device
-            device.setStatusDevice("OFFLINE");
+            device.setStatusDevice("MAINTENANCE");
             device.setLastChecked(new Date());
             deviceRepository.save(device);
             

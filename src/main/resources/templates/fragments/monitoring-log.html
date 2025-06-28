@@ -59,8 +59,7 @@
                             <td th:text="${log.responseTime} ?: '-'">-</td>
                             <td th:text="${log.monitoring != null} ? ${#dates.format(log.monitoring, 'dd-MM-yyyy HH:mm:ss')} : '-'"></td>
 
-                             <td>
-                                <!-- Tampilkan keterangan berdasarkan logReason -->
+                            <!-- <td>
                                 <span th:if="${log.pingStatus}">
                                     <span th:if="${log.logReason == T(com.unsia.netinv.netinve.LogReason).RECOVERED}" 
                                           class="badge bg-success">Recovered</span>
@@ -68,6 +67,23 @@
                                           class="badge bg-primary">Normal</span>
                                 </span>
                                 <span th:unless="${log.pingStatus}" class="badge bg-danger">Down</span>
+                            </td> -->
+
+                            <td>
+                                <!-- Tampilkan keterangan berdasarkan logReason dan status device -->
+                                <span th:if="${log.pingStatus}">
+                                    <span th:if="${log.logReason == T(com.unsia.netinv.netinve.LogReason).RECOVERED}" 
+                                        class="badge bg-success">Recovered</span>
+                                    <span th:if="${log.logReason == T(com.unsia.netinv.netinve.LogReason).NORMAL}" 
+                                        class="badge bg-primary">Normal</span>
+                                </span>
+                                
+                                <span th:unless="${log.pingStatus}">
+                                    <span th:if="${log.device.statusDevice == 'MAINTENANCE'}" 
+                                        class="badge bg-warning text-dark">Maintenance</span>
+                                    <span th:unless="${log.device.statusDevice == 'MAINTENANCE'}" 
+                                        class="badge bg-danger">Down</span>
+                                </span>
                             </td>
                             
                             <!-- <td>
