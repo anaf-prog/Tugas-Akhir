@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Entity
@@ -45,6 +46,9 @@ public class MaintenanceLog {
 
     @Column(name = "technician")
     private String technician;
+
+    @Transient
+    private Boolean maintenanceOver;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", referencedColumnName = "id")

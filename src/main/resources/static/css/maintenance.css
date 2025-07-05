@@ -48,29 +48,8 @@
     font-size: 0.875rem;
 }
 
-/* Custom Pagination */
-.dataTables_wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.dataTables_paginate {
-  justify-content: center !important;
-  display: flex !important;  
-  margin-top: 1.5rem !important; /* Tambahkan margin atas */
-  padding-top: 1rem !important; /* Tambahkan padding atas */
-  border-top: 1px solid #dee2e6; /* Garis pemisah opsional */
-}
-
 .paginate_button {
   margin: 0 3px !important;
-}
-
-/* Pastikan wrapper pagination mengambil space penuh */
-.dataTables_wrapper .bottom {
-  width: 100%;
-  margin-top: auto; /* Ini akan mendorong pagination ke bawah */
 }
 
 /* Alert Notification Styles */
@@ -124,4 +103,46 @@
 
 .countdown.completed, .completion-countdown.completed {
     color: #28a745;
+}
+
+/* Perbaikan untuk tabel maintenance */
+#maintenanceTable tbody td {
+    vertical-align: middle !important;
+}
+
+#maintenanceTable td:nth-child(3) { /* Kolom deskripsi */
+    max-width: 300px;
+    word-wrap: break-word;
+    white-space: normal !important;
+}
+
+#maintenanceTable td:last-child { /* Kolom aksi */
+    white-space: nowrap;
+    width: 1%;
+}
+
+/* Memastikan tombol tetap sejajar */
+.disable-device-btn {
+    margin-top: 0 !important;
+}
+
+/* Memastikan tabel tetap responsif */
+@media (max-width: 992px) {
+    #maintenanceTable {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    #maintenanceTable td:nth-child(3) {
+        max-width: 200px;
+    }
+}
+
+/* tombol non aktifkan agar tidak bisa diklik jika waktu maintenance selesai */
+.disable-device-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #6c757d;
 }
