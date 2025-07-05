@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar toggle
+    $('#sidebarCollapse').on('click', function() {
+        $('#sidebar').toggleClass('active');
+        $('#content').toggleClass('active');
+        
+        // Force redraw untuk mencegah bug visual
+        document.body.style.overflow = 'hidden';
+        setTimeout(function() {
+            document.body.style.overflow = '';
+        }, 10);
+    });
+
     // Data lokasi dan perangkat (ini nanti bisa diganti dengan fetch API ke backend)
     const locations = [
         {id: 1, building: 'Gedung A', floor: 'Lantai 1', room: 'Server Room Utama', location_name: 'Gedung UNSIA'},
