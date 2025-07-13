@@ -263,7 +263,7 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
         }
 
         // logger.debug("Created NEW log for device {} with reason {}", device.getDeviceName(), reason);
-        System.out.println("Created NEW log for device {} with reason {}" + device.getDeviceName() + reason);
+        System.out.println("Created NEW log for device {} with reason {}" + device.getDeviceName() +   reason);
     }
 
     // Update log terakhir jika ada

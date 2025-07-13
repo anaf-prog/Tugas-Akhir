@@ -1,4 +1,13 @@
 /* Card Styles */
+/* Style untuk animasi matrix */
+.matrix-animation {
+    background-color: black;
+    width: 100%;
+    overflow: hidden;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
 .device-card {
     cursor: pointer;
     transition: all 0.3s ease;

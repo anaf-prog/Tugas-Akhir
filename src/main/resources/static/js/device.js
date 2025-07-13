@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 10);
     });
 
-    // Network animation for each card
-    document.querySelectorAll('.network-animation').forEach(canvas => {
-        initNetworkAnimation(canvas);
+    // Matrix animation for each card
+    document.querySelectorAll('.matrix-animation').forEach(canvas => {
+        initMatrixAnimation(canvas);
     });
 
     // Modal show event
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function initNetworkAnimation(container) {
+function initMatrixAnimation(container) {
     // Create canvas element
     const canvas = document.createElement('canvas');
     container.appendChild(canvas);
@@ -63,75 +63,53 @@ function initNetworkAnimation(container) {
     canvas.height = container.offsetHeight;
     
     const ctx = canvas.getContext('2d');
-    const nodes = [];
-    const connections = [];
     
-    // Create nodes based on device type
-    const deviceType = container.closest('.device-card').getAttribute('data-device-type');
-    let nodeCount = 5;
+    // Matrix characters - campuran angka dan biner
+    const chars = "01abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     
-    if (deviceType === 'ROUTER') nodeCount = 8;
-    else if (deviceType === 'SWITCH') nodeCount = 6;
-    else if (deviceType === 'SERVER') nodeCount = 4;
+    // Ukuran font dan kolom
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
     
-    // Create nodes
-    for (let i = 0; i < nodeCount; i++) {
-        nodes.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            vx: Math.random() * 0.5 - 0.25,
-            vy: Math.random() * 0.5 - 0.25,
-            radius: 3 + Math.random() * 3
-        });
+    // Array untuk menyimpan posisi Y setiap kolom
+    const drops = [];
+    for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * -100; // Mulai dari atas dengan offset acak
     }
     
-    // Create connections
-    for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-            if (Math.random() > 0.7) {
-                connections.push({ from: i, to: j });
+    // Warna hijau matrix
+    const matrixGreen = '#20C20E';
+    
+    // Animation loop
+    function draw() {
+        // Set semi-transparent background untuk efek trail
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Set warna dan font
+        ctx.fillStyle = matrixGreen;
+        ctx.font = fontSize + 'px monospace';
+        
+        // Gambar karakter untuk setiap kolom
+        for (let i = 0; i < drops.length; i++) {
+            // Ambil karakter acak
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            
+            // Gambar karakter
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            
+            // Reset drop ke atas jika mencapai bawah atau secara acak
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
             }
+            
+            // Pindahkan ke bawah
+            drops[i]++;
         }
     }
     
-    // Animation loop
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Update nodes
-        nodes.forEach(node => {
-            node.x += node.vx;
-            node.y += node.vy;
-            
-            // Bounce off walls
-            if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-            if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
-        });
-        
-        // Draw connections
-        ctx.strokeStyle = 'rgba(100, 100, 255, 0.2)';
-        ctx.lineWidth = 1;
-        connections.forEach(conn => {
-            const from = nodes[conn.from];
-            const to = nodes[conn.to];
-            ctx.beginPath();
-            ctx.moveTo(from.x, from.y);
-            ctx.lineTo(to.x, to.y);
-            ctx.stroke();
-        });
-        
-        // Draw nodes
-        nodes.forEach(node => {
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#4285F4';
-            ctx.fill();
-        });
-        
-        requestAnimationFrame(animate);
-    }
-    
-    animate();
+    // Jalankan animasi setiap 33ms (~30fps)
+    setInterval(draw, 50);
     
     // Handle resize
     window.addEventListener('resize', function() {
