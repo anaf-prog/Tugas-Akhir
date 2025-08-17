@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+    <property name="LOGS" value="./logs" />
+
+    <!-- Console Appender -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level){FATAL=red blink, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=green} [%cyan(%t)] %green(%F) - %green(%L): %msg%n%throwable</Pattern>
+        </layout>
+    </appender>
+
+    <!-- Ini buat support Spring Boot -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Penting buat liat status logback pas startup -->
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <!-- File Appender dengan Rolling harian + maxHistory 14 hari -->
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/sismon.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- Format log sama dengan console -->
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%F - %L] : %msg%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/archived/hth-logger-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>14</maxHistory> <!-- Simpan hanya 14 hari -->
+        </rollingPolicy>
+    </appender>
+
+    <!-- Root Logger -->
+    <root level="info">
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
+    </root>
+
+    <!-- Logger khusus untuk package aplikasi -->
+    <logger name="com.unsia.netinv" level="trace" additivity="false">
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
+    </logger>
+
+</configuration>

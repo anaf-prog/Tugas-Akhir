@@ -37,19 +37,39 @@ public class LoginController {
         return "login";
     }
 
+    // @PostMapping("/login")
+    // public String processLogin(@RequestParam String username, @RequestParam String password, HttpSession session, Model model) {
+    //     Users users = userService.authenticate(username, password);
+
+    //     if (users != null) {
+    //         // Simpan user sementara di session sebelum verifikasi OTP
+    //         session.setAttribute("tempUser", users);
+            
+    //         // Kirim OTP ke email user
+    //         otpService.sendOtp(users.getEmail());
+            
+    //         // Redirect ke halaman verifikasi OTP
+    //         return "redirect:/verify-otp";
+    //     } else {
+    //         model.addAttribute("error", "Username atau password salah");
+    //         return "login";
+    //     }
+    // }
+
+    // development tanpa OTP, bypass OTP ( buat develop, bypass OTP biar ga ribet sama OTP kalo login)
     @PostMapping("/login")
-    public String processLogin(@RequestParam String username, @RequestParam String password, HttpSession session, Model model) {
+    public String processLogin(@RequestParam String username, 
+                            @RequestParam String password, 
+                            HttpSession session, 
+                            Model model) {
         Users users = userService.authenticate(username, password);
 
         if (users != null) {
-            // Simpan user sementara di session sebelum verifikasi OTP
-            session.setAttribute("tempUser", users);
-            
-            // Kirim OTP ke email user
-            otpService.sendOtp(users.getEmail());
-            
-            // Redirect ke halaman verifikasi OTP
-            return "redirect:/verify-otp";
+            // Langsung login tanpa OTP
+            users.setPassword(null);
+            session.setAttribute("user", users);
+
+            return "redirect:/dashboard"; // langsung masuk dashboard
         } else {
             model.addAttribute("error", "Username atau password salah");
             return "login";

@@ -25,6 +25,10 @@ public class EmailNotificationServiceimpl implements EmailNotificationService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailNotificationServiceimpl.class);
 
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    @SuppressWarnings("unused")
+    private static final String ANSI_RED = "\u001B[31m";
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -81,7 +85,7 @@ public class EmailNotificationServiceimpl implements EmailNotificationService {
             ));
 
             mailSender.send(message);
-            logger.info("Notifikasi email terkirim ke {} VIEWER untuk perangkat {} yang mati", 
+            logger.info(ANSI_YELLOW + "Notifikasi email terkirim ke {} VIEWER untuk perangkat {} yang mati", 
                 toEmails.length, manageDevice.getDeviceName());
             
         } catch (Exception e) {

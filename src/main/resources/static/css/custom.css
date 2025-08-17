@@ -164,6 +164,11 @@ select[multiple] option {
     animation: ping-blink 2s infinite;
 }
 
+.ping-backup .ping-light {
+    background-color: #fd7e14; /* Oranye */
+    animation: ping-blink 2s infinite;
+}
+
 .ping-inactive .ping-light {
     background-color: #dc3545; /* Merah */
     opacity: 1 !important;

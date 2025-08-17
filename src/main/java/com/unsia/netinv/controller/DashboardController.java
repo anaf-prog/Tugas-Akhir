@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.unsia.netinv.entity.Users;
 import com.unsia.netinv.service.DashboardService;
+import com.unsia.netinv.service.FailoverService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -22,6 +23,9 @@ public class DashboardController {
 
     @Autowired
     private DashboardService dashboardService;
+
+    @Autowired
+    private FailoverService failoverService;
 
     @GetMapping
     public String showDasboard(@RequestParam(value = "devicePage", defaultValue = "0") int devicePage,
@@ -44,6 +48,8 @@ public class DashboardController {
         Map<String, Object> dashboardData = dashboardService.getDashboardData(devicePage, deviceSize, logPage, logSize, 
                                                                               failoverPage, failoverSize, search, status, type, user);
         model.addAllAttributes(dashboardData);
+
+        model.addAttribute("failoverService", failoverService);
 
         model.addAttribute("searchParam", search);
         model.addAttribute("statusParam", status);

@@ -15,24 +15,45 @@
                                 <th>IP</th>
                                 <th>Status</th>
                                 <th>Waktu Terakhir Ping</th>
-                                <th>Aksi<th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="log : ${latestLogs}" th:attr="data-device-id=${log.device.id}">
                                 <td th:text="${log.device.deviceName}">Router Utama</td>
+
                                 <td>
-                                    <div class="ping-indicator" 
-                                        th:classappend="${log.pingStatus} ? 'ping-active' : 'ping-inactive'">
-                                        <div class="ping-light"></div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="ping-indicator"
+                                            th:classappend="${log.pingStatus != null} ? 
+                                                (${failoverService.getDeviceStatusInfo(log)?.get('pingClass')} ?: 'ping-inactive') 
+                                                : 'ping-inactive'">
+                                            <div class="ping-light"></div>
+                                        </div>
                                     </div>
                                 </td>
+
                                 <td th:text="${log.device.ipAddress}">192.168.1.1</td>
+
                                 <td>
-                                    <span class="badge bg-success" th:if="${log.pingStatus}">ONLINE</span>
-                                    <span class="badge bg-danger" th:unless="${log.pingStatus}">OFFLINE</span>
+                                    <span class="badge" th:attr="id='status-' + ${log.device.id}"
+                                        th:classappend="${log.pingStatus != null} ? 
+                                            (${failoverService.getDeviceStatusInfo(log)?.get('badgeClass')} ?: 'bg-danger') 
+                                            : 'bg-danger'"
+                                        th:text="${log.pingStatus != null} ? 
+                                            (${log.device.deviceName?.toLowerCase()?.contains('backup')} ? 
+                                                (${failoverService.isBackupActive(log.device.id)} ? 'ONLINE' : 'ONLINE STANDBY') 
+                                                : 'ONLINE') 
+                                            : 'OFFLINE'">
+                                        ONLINE
+                                    </span> 
                                 </td>
-                                <td class="ping-time" th:text="${#dates.format(log.monitoring, 'yyyy-MM-dd HH:mm:ss')}">2025-05-01 16:11:12</td>
+
+                                <td class="ping-time" th:text="${#dates.format(log.monitoring, 'yyyy-MM-dd HH:mm:ss')}" 
+                                    th:attr="id='time-' + ${log.device.id}">
+                                    2025-05-01 16:11:12
+                                </td>
+
                                 <td>
                                     <button class="btn btn-sm recovery-btn"
                                             th:classappend="${log.pingStatus} ? 'btn-secondary disabled' : 'btn-success'"

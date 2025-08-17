@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "spring.jackson.stream.write-constraints.max-nesting-depth",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.jackson.stream.write-constraints.max-nesting-depth'"
+  },
+  {
+    "name": "support.email",
+    "type": "java.lang.String",
+    "description": "A description for 'support.email'"
+  }
+]}

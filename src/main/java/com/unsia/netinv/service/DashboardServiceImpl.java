@@ -2,6 +2,7 @@ package com.unsia.netinv.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -88,8 +90,8 @@ public class DashboardServiceImpl implements DashboardService {
         Pageable devicePageable = PageRequest.of(devicePage, deviceSize, Sort.by("deviceName").ascending());
         Page<Device> devicePageResult = deviceRepository.findAll(new DeviceSpecification(search, status, type), devicePageable);
 
-        Pageable logPageable = PageRequest.of(logPage, logSize, Sort.by("monitoring").descending());
-        Page<MonitoringLog> logPageResult = monitoringLogRepository.findLatestLogPerDevice(logPageable);
+        Pageable logPageable = PageRequest.of(logPage, logSize);
+        Page<MonitoringLog> logPageResult = monitoringLogRepository.findLatestLogPerDeviceOrderedByName(logPageable);
 
         Pageable failoverPageable = PageRequest.of(failoverPage, failoverSize, Sort.by("waktu").descending());
         Page<FailOverLogs> failoverPageResult = failOverLogRepository.findAllByOrderByWaktuDesc(failoverPageable);
@@ -110,6 +112,18 @@ public class DashboardServiceImpl implements DashboardService {
             }
         }
 
+        // Urutkan secara manual
+        List<MonitoringLog> sortedLogs = logPageResult.getContent().stream()
+            .sorted(Comparator.comparing(log -> log.getDevice().getDeviceName()))
+            .collect(Collectors.toList());
+        
+        // Buat Page baru dengan data yang sudah diurutkan
+        Page<MonitoringLog> sortedLogPage = new PageImpl<>(
+            sortedLogs, 
+            logPageable, 
+            logPageResult.getTotalElements()
+        );
+
 
         data.put("currentUser", user.getUsername());
         data.put("userRole", user.getRole());
@@ -125,7 +139,7 @@ public class DashboardServiceImpl implements DashboardService {
         data.put("deviceTotalPages", devicePageResult.getTotalPages());
         data.put("totalItems", devicePageResult.getTotalElements());
 
-        data.put("latestLogs", logPageResult.getContent());
+        data.put("latestLogs", sortedLogPage.getContent());
         data.put("logCurrentPage", logPageResult.getNumber());
         data.put("logTotalPages", logPageResult.getTotalPages());
         data.put("logTotalItems", logPageResult.getTotalElements());

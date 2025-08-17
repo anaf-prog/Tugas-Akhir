@@ -77,6 +77,8 @@ public interface MonitoringLogRepository extends JpaRepository<MonitoringLog, Lo
     @Query("UPDATE MonitoringLog m SET m.logReason = :reason WHERE m.logReason IS NULL")
     void setDefaultLogReason(@Param("reason") LogReason reason);
 
-
-    
+    @Query("SELECT ml FROM MonitoringLog ml WHERE ml.id IN " +
+       "(SELECT MAX(m.id) FROM MonitoringLog m GROUP BY m.device.id) " +
+       "ORDER BY ml.device.deviceName ASC")
+    Page<MonitoringLog> findLatestLogPerDeviceOrderedByName(Pageable pageable);
 }
