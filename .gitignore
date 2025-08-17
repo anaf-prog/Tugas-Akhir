@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Skip file log ###
+/logs/sismon.log
+/logs/**/sismon.log
