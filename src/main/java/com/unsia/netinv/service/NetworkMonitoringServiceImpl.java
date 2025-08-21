@@ -57,7 +57,6 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
             lastKnownStatus.put(device.getId(), "ONLINE".equals(device.getStatusDevice())));
     }
 
-    // ini masih di test setiap detik ping nya
     @Override
     @Scheduled(fixedRate = 1200)
     public void monitoringAlldevices() {
@@ -69,7 +68,7 @@ public class NetworkMonitoringServiceImpl implements NetworkMonitoringService {
 
         // Lanjut normal monitoring
         for (Device device : devices) {
-            monitoringDeviceStatusService.monitorSingleDevice(device, lastKnownStatus);
+            monitoringDeviceStatusService.monitoringDevice(device, lastKnownStatus);
         }
 
         // System.out.println("=== Monitoring cycle completed at " + new Date() + " ===\n");

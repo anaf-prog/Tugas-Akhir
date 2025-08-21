@@ -34,8 +34,8 @@ public class MonitoringDeviceStatusService {
     @Autowired
     private FailoverService failoverService;
 
-    // Memonitor status single device dengan ping
-    public void monitorSingleDevice(Device device, Map<Long, Boolean> lastKnownStatus) {
+    // Memonitor status device dengan ping
+    public void monitoringDevice(Device device, Map<Long, Boolean> lastKnownStatus) {
         try {
             // Skip monitoring jika device dalam maintenance
             if ("MAINTENANCE".equals(device.getStatusDevice())) {
