@@ -42,7 +42,7 @@
                                 <th>IP Address</th>
                                 <th>Jenis</th>
                                 <th>Lokasi</th>
-                                <th>Status</th>
+                                <th>Status</th> <!-- Kolom ini akan diupdate real-time -->
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -55,9 +55,15 @@
                                 </td>
                                 <td th:with="loc=${device.location}" th:text="${loc.floor + ', ' + loc.room + ', ' + loc.locationName}">Lab Jaringan</td>
                                 <td>
-                                    <span class="badge bg-success" th:if="${device.statusDevice == 'ONLINE'}">Aktif</span>
-                                    <span class="badge bg-danger" th:if="${device.statusDevice == 'OFFLINE'}">Down</span>
-                                    <span class="badge bg-warning" th:if="${device.statusDevice == 'MAINTENANCE'}">Maintenance</span>
+                                    <!-- Tambahkan ID unik untuk setiap badge status -->
+                                    <span class="badge" 
+                                          th:attr="id='device-status-' + ${device.id}"
+                                          th:classappend="${device.statusDevice == 'ONLINE'} ? 'bg-success' : 
+                                                          (${device.statusDevice == 'OFFLINE'} ? 'bg-danger' : 'bg-warning')">
+                                        <span th:if="${device.statusDevice == 'ONLINE'}">Aktif</span>
+                                        <span th:if="${device.statusDevice == 'OFFLINE'}">Down</span>
+                                        <span th:if="${device.statusDevice == 'MAINTENANCE'}">Maintenance</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
