@@ -31,6 +31,14 @@
         </fileSet>
 
         <fileSet>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/logback-spring.xml</include>
+            </includes>
+            <outputDirectory>/config</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${project.build.directory}</directory> <!-- The directory where your JAR is located -->
             <includes>
                 <include>${project.build.finalName}.jar</include> <!-- Includes the project’s own JAR -->

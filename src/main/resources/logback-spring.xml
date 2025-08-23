@@ -6,7 +6,7 @@
     <!-- Console Appender -->
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level){FATAL=red blink, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=green} %green(%F) - %green(%L): %msg%n%throwable</pattern>
+            <pattern>%magenta(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight(%-5level){FATAL=red blink, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=green} %green(%class{0}) - %green(%line) - %msg%n%throwable</pattern>
         </encoder>
     </appender>
 
@@ -22,7 +22,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOGS}/archived/hth-logger-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOGS}/archived/netinv-logger-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>14</maxHistory> <!-- Simpan hanya 14 hari -->
         </rollingPolicy>
     </appender>
