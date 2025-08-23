@@ -64,10 +64,7 @@
                                         <a th:href="@{/devices/edit/{id}(id=${device.id})}" class="btn btn-sm btn-warning me-2">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <!-- <a th:href="@{/devices/delete/{id}(id=${device.id})}" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </a> -->
-                                            <button class="btn btn-sm btn-danger delete-btn" th:data-id="${device.id}">
+                                        <button class="btn btn-sm btn-danger delete-btn" th:data-id="${device.id}">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>

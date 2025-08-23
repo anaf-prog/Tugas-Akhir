@@ -33,37 +33,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function connect() {
-        stompClient.connect({}, function(frame) {
-            console.log('TERHUBUNG KE WEBSOCKET', frame);
-            
-            // Subscribe dengan callback error
-            const subscription = stompClient.subscribe('/topic/ping-updates', function(message) {
-                console.log("MENERIMA PESAN:", message);
-                
-                try {
-                    const data = JSON.parse(message.body);
-                    console.log("DATA PARSED:", data);
-                    
-                    if (!data.deviceId || !data.pingTime) {
-                        console.error("Data tidak lengkap:", data);
-                        return;
-                    }
-                    
-                    updateDeviceRow(data.deviceId, data.pingTime, data.status);
-                } catch (e) {
-                    console.error("ERROR PARSING:", e, "Raw message:", message.body);
-                }
-            }, {
-                'id': 'ping-updates-subscription' // Beri ID untuk memudahkan debugging
-            });
-            
-            console.log("Subscribed dengan ID:", subscription.id);
-            
-        }, function(error) {
-            console.error('WEBSOCKET ERROR:', error);
-            setTimeout(connect, 5000); // Reconnect setelah 5 detik
-        });
+    // [FUNGSI BARU] Update tombol recovery berdasarkan status
+    function updateRecoveryButton(deviceId, status) {
+        console.log("UPDATE RECOVERY BUTTON untuk device:", deviceId, "Status:", status);
+        
+        const row = document.querySelector(`tr[data-device-id="${deviceId}"]`);
+        if (!row) {
+            console.warn("ROW TIDAK DITEMUKAN untuk device:", deviceId);
+            return;
+        }
+
+        const recoveryButton = row.querySelector('.recovery-btn');
+        if (!recoveryButton) {
+            console.warn("TOMBOL RECOVERY TIDAK DITEMUKAN untuk device:", deviceId);
+            return;
+        }
+
+        // Perbarui status tombol berdasarkan status perangkat
+        if (status === 'OFFLINE') {
+            recoveryButton.classList.remove('btn-secondary', 'disabled');
+            recoveryButton.classList.add('btn-success');
+            recoveryButton.disabled = false;
+        } else {
+            recoveryButton.classList.remove('btn-success');
+            recoveryButton.classList.add('btn-secondary', 'disabled');
+            recoveryButton.disabled = true;
+        }
+        
+        console.log("Tombol recovery diperbarui untuk device:", deviceId);
     }
 
     function updateDeviceRow(deviceId, pingTime, status) {
@@ -115,6 +112,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 indicator.className = 'ping-indicator ping-inactive';
             }
         }
+
+        // 4. [BARU] Update Tombol Recovery
+        updateRecoveryButton(deviceId, status);
+    }
+
+    function connect() {
+        stompClient.connect({}, function(frame) {
+            console.log('TERHUBUNG KE WEBSOCKET', frame);
+            
+            // Subscribe dengan callback error
+            const subscription = stompClient.subscribe('/topic/ping-updates', function(message) {
+                console.log("MENERIMA PESAN:", message);
+                
+                try {
+                    const data = JSON.parse(message.body);
+                    console.log("DATA PARSED:", data);
+                    
+                    if (!data.deviceId || !data.pingTime) {
+                        console.error("Data tidak lengkap:", data);
+                        return;
+                    }
+                    
+                    updateDeviceRow(data.deviceId, data.pingTime, data.status);
+                } catch (e) {
+                    console.error("ERROR PARSING:", e, "Raw message:", message.body);
+                }
+            }, {
+                'id': 'ping-updates-subscription' // Beri ID untuk memudahkan debugging
+            });
+            
+            console.log("Subscribed dengan ID:", subscription.id);
+            
+        }, function(error) {
+            console.error('WEBSOCKET ERROR:', error);
+            setTimeout(connect, 5000); // Reconnect setelah 5 detik
+        });
     }
 
     // Handle sebelum unload

@@ -40,10 +40,17 @@ function showRecoveryModal(type, message) {
 
 // Fungsi untuk handle recovery device
 function setupRecoveryButtons() {
+    // Hapus event listener sebelumnya untuk menghindari duplikasi
     $(document).off('click', '.recovery-btn').on('click', '.recovery-btn', function(e) {
         e.preventDefault();
         
         const button = $(this);
+        
+        // Cek jika tombol disabled, hentikan proses
+        if (button.hasClass('disabled') || button.prop('disabled')) {
+            return false;
+        }
+        
         const row = button.closest('tr');
         const isOnline = row.find('.badge').hasClass('bg-success');
         
@@ -82,7 +89,8 @@ function setupRecoveryButtons() {
                         .addClass('ping-active');
                     
                     button.removeClass('btn-success')
-                          .addClass('btn-secondary disabled');
+                          .addClass('btn-secondary disabled')
+                          .prop('disabled', true);
                     
                     showRecoveryModal('success', response.message);
                 } else {
@@ -101,6 +109,9 @@ function setupRecoveryButtons() {
             }
         });
     });
+    
+    // Tambahkan penanda untuk tombol yang sudah diinisialisasi
+    $('.recovery-btn').addClass('initialized');
 }
 
 // Fungsi untuk update status perangkat (optional)

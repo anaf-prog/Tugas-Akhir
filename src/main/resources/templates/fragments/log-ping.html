@@ -57,10 +57,12 @@
                                 <td>
                                     <button class="btn btn-sm recovery-btn"
                                             th:classappend="${log.pingStatus} ? 'btn-secondary disabled' : 'btn-success'"
-                                            th:attr="data-ip=${log.device.ipAddress}">
+                                            th:disabled="${log.pingStatus}"
+                                            th:attr="data-ip=${log.device.ipAddress}, data-device-id=${log.device.id}">
                                         <i class="fas fa-sync-alt"></i> Recovery
                                     </button>
                                 </td>
+                                
                             </tr>
                         </tbody>
                     </table>
