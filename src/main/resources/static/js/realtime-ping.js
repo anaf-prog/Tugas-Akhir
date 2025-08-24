@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const stompClient = Stomp.over(socket);
     
     stompClient.debug = function(str) {
-        console.log('STOMP DEBUG:', str);
+        // console.log('STOMP DEBUG:', str);
     };
 
     // Format waktu yang lebih robust
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Validasi date
             if (isNaN(date.getTime())) {
-                console.error("Invalid date:", timestamp);
+                // console.error("Invalid date:", timestamp);
                 return "Waktu tidak valid";
             }
             
@@ -35,17 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // [FUNGSI BARU] Update tombol recovery berdasarkan status
     function updateRecoveryButton(deviceId, status) {
-        console.log("UPDATE RECOVERY BUTTON untuk device:", deviceId, "Status:", status);
+        // console.log("UPDATE RECOVERY BUTTON untuk device:", deviceId, "Status:", status);
         
         const row = document.querySelector(`tr[data-device-id="${deviceId}"]`);
         if (!row) {
-            console.warn("ROW TIDAK DITEMUKAN untuk device:", deviceId);
+            // console.warn("ROW TIDAK DITEMUKAN untuk device:", deviceId);
             return;
         }
 
         const recoveryButton = row.querySelector('.recovery-btn');
         if (!recoveryButton) {
-            console.warn("TOMBOL RECOVERY TIDAK DITEMUKAN untuk device:", deviceId);
+            // console.warn("TOMBOL RECOVERY TIDAK DITEMUKAN untuk device:", deviceId);
             return;
         }
 
@@ -60,15 +60,15 @@ document.addEventListener('DOMContentLoaded', function() {
             recoveryButton.disabled = true;
         }
         
-        console.log("Tombol recovery diperbarui untuk device:", deviceId);
+        // console.log("Tombol recovery diperbarui untuk device:", deviceId);
     }
 
     function updateDeviceRow(deviceId, pingTime, status) {
-        console.log("MENCARI ROW UNTUK DEVICE:", deviceId, "Status:", status);
+        // console.log("MENCARI ROW UNTUK DEVICE:", deviceId, "Status:", status);
         
         const row = document.querySelector(`tr[data-device-id="${deviceId}"]`);
         if (!row) {
-            console.warn("ROW TIDAK DITEMUKAN untuk device:", deviceId);
+            // console.warn("ROW TIDAK DITEMUKAN untuk device:", deviceId);
             return;
         }
 
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const timeCell = row.querySelector('td.ping-time');
         if (timeCell) {
             const formattedTime = formatTime(pingTime);
-            console.log("UPDATE WAKTU:", formattedTime);
+            // console.log("UPDATE WAKTU:", formattedTime);
             timeCell.textContent = formattedTime;
             timeCell.classList.add('time-updated');
             setTimeout(() => timeCell.classList.remove('time-updated'), 1000);
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Update Status Badge
         const statusBadge = row.querySelector('td span.badge');
         if (statusBadge) {
-            console.log("UPDATE STATUS:", status);
+            // console.log("UPDATE STATUS:", status);
             
             statusBadge.textContent = status;
             
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 3. Update Ping Indicator
         const indicator = row.querySelector('.ping-indicator');
         if (indicator) {
-            console.log("UPDATE INDICATOR:", status);
+            // console.log("UPDATE INDICATOR:", status);
             
             if (status === 'ONLINE') {
                 indicator.className = 'ping-indicator ping-active';
@@ -123,14 +123,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Subscribe dengan callback error
             const subscription = stompClient.subscribe('/topic/ping-updates', function(message) {
-                console.log("MENERIMA PESAN:", message);
+                // console.log("MENERIMA PESAN:", message);
                 
                 try {
                     const data = JSON.parse(message.body);
-                    console.log("DATA PARSED:", data);
+                    // console.log("DATA PARSED:", data);
                     
                     if (!data.deviceId || !data.pingTime) {
-                        console.error("Data tidak lengkap:", data);
+                        // console.error("Data tidak lengkap:", data);
                         return;
                     }
                     
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('beforeunload', function() {
         if (stompClient && stompClient.connected) {
             stompClient.disconnect();
-            console.log("WebSocket disconnected sebelum unload");
+            // console.log("WebSocket disconnected sebelum unload");
         }
     });
 

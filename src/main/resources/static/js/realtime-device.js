@@ -6,16 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const stompClient = Stomp.over(socket);
     
     stompClient.debug = function(str) {
-        console.log('STOMP DEBUG:', str);
+        // console.log('STOMP DEBUG:', str);
     };
 
     // Fungsi untuk memperbarui status perangkat di tabel daftar perangkat
     function updateDeviceStatus(deviceId, status) {
-        console.log("Memperbarui status untuk perangkat:", deviceId, "Status:", status);
+        // console.log("Memperbarui status untuk perangkat:", deviceId, "Status:", status);
         
         const statusBadge = document.getElementById('device-status-' + deviceId);
         if (!statusBadge) {
-            console.warn("Badge status tidak ditemukan untuk device:", deviceId);
+            // console.warn("Badge status tidak ditemukan untuk device:", deviceId);
             return;
         }
 
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statusBadge.className = 'badge bg-secondary';
         }
         
-        console.log("Status perangkat " + deviceId + " diperbarui menjadi: " + status);
+        // console.log("Status perangkat " + deviceId + " diperbarui menjadi: " + status);
     }
 
     function connect() {
@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Subscribe ke topik yang sama dengan log ping
             const subscription = stompClient.subscribe('/topic/ping-updates', function(message) {
-                console.log("MENERIMA PESAN STATUS:", message);
+                // console.log("MENERIMA PESAN STATUS:", message);
                 
                 try {
                     const data = JSON.parse(message.body);
-                    console.log("DATA STATUS PARSED:", data);
+                    // console.log("DATA STATUS PARSED:", data);
                     
                     if (!data.deviceId || !data.status) {
-                        console.error("Data status tidak lengkap:", data);
+                        // console.error("Data status tidak lengkap:", data);
                         return;
                     }
                     
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'id': 'device-status-subscription'
             });
             
-            console.log("Subscribed untuk status perangkat dengan ID:", subscription.id);
+            // console.log("Subscribed untuk status perangkat dengan ID:", subscription.id);
             
         }, function(error) {
             console.error('WEBSOCKET ERROR UNTUK STATUS:', error);

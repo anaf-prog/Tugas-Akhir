@@ -8,5 +8,15 @@
     "name": "support.email",
     "type": "java.lang.String",
     "description": "A description for 'support.email'"
+  },
+  {
+    "name": "spring.boot.classpath.verification.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.boot.classpath.verification.enabled'"
+  },
+  {
+    "name": "spring.devtools.add-properties",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.devtools.add-properties'"
   }
 ]}

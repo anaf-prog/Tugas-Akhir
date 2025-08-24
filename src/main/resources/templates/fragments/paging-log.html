@@ -6,10 +6,10 @@
             <!-- First Page -->
             <li class="page-item" th:classappend="${logCurrentPage == 0} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
-                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
-                                           logPage=0, 
-                                           logSize=${param.logSize != null ? param.logSize : 5})}">
+                   th:href="@{'/dashboard#log-ping'(devicePage=${deviceCurrentPage}, 
+                                                   deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                                   logPage=0, 
+                                                   logSize=${param.logSize != null ? param.logSize : 5})}">
                     <span>&laquo;</span>
                 </a>
             </li>
@@ -17,10 +17,10 @@
             <!-- Previous Page -->
             <li class="page-item" th:classappend="${logCurrentPage == 0} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
-                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
-                                           logPage=${logCurrentPage - 1}, 
-                                           logSize=${param.logSize != null ? param.logSize : 5})}">
+                   th:href="@{'/dashboard#log-ping'(devicePage=${deviceCurrentPage}, 
+                                                   deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                                   logPage=${logCurrentPage - 1}, 
+                                                   logSize=${param.logSize != null ? param.logSize : 5})}">
                     <span>&lsaquo;</span>
                 </a>
             </li>
@@ -41,20 +41,20 @@
                 class="page-item" 
                 th:classappend="${i == logCurrentPage} ? 'active'">
                 <a class="page-link"
-                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
-                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
-                                           logPage=${i}, 
-                                           logSize=${param.logSize != null ? param.logSize : 5})}"
+                   th:href="@{'/dashboard#log-ping'(devicePage=${deviceCurrentPage}, 
+                                                   deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                                   logPage=${i}, 
+                                                   logSize=${param.logSize != null ? param.logSize : 5})}"
                    th:text="${i + 1}">1</a>
             </li>
 
             <!-- Next Page -->
             <li class="page-item" th:classappend="${logCurrentPage == logTotalPages - 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
-                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
-                                           logPage=${logCurrentPage + 1}, 
-                                           logSize=${param.logSize != null ? param.logSize : 5})}">
+                   th:href="@{'/dashboard#log-ping'(devicePage=${deviceCurrentPage}, 
+                                                   deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                                   logPage=${logCurrentPage + 1}, 
+                                                   logSize=${param.logSize != null ? param.logSize : 5})}">
                     <span>&rsaquo;</span>
                 </a>
             </li>
@@ -62,10 +62,10 @@
             <!-- Last Page -->
             <li class="page-item" th:classappend="${logCurrentPage == logTotalPages - 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage}, 
-                                           deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
-                                           logPage=${logTotalPages - 1}, 
-                                           logSize=${param.logSize != null ? param.logSize : 5})}">
+                   th:href="@{'/dashboard#log-ping'(devicePage=${deviceCurrentPage}, 
+                                                   deviceSize=${param.deviceSize != null ? param.deviceSize : 5}, 
+                                                   logPage=${logTotalPages - 1}, 
+                                                   logSize=${param.logSize != null ? param.logSize : 5})}">
                     <span>&raquo;</span>
                 </a>
             </li>
