@@ -13,5 +13,5 @@ Aplikasi ini adalah **sistem monitoring jaringan** yang dilengkapi dengan **fitu
 
 ### 2. **Clone Repository**
 ```bash
-git clone https://github.com/username/nama-repo.git
-cd nama-repo
+git clone git@github.com:anaf-prog/Tugas-Akhir.git
+cd Tugas-Akhir
