@@ -1,4 +1,4 @@
-# Sistem Monitoring Jaringan dengan Fitur Rerouting Otomatis
+# Sistem Monitoring Jaringan dengan Fitur Rerouting Otomatis Berbasis Spring Boot
 
 Aplikasi ini adalah **sistem monitoring jaringan** yang dilengkapi dengan **fitur rerouting otomatis**. Dibangun menggunakan **Spring Boot**, aplikasi ini bertujuan untuk memantau status jaringan dan secara otomatis melakukan pengalihan rute (rerouting) ketika terjadi gangguan.
 
