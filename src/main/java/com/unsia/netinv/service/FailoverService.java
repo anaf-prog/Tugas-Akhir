@@ -9,7 +9,5 @@ public interface FailoverService {
 
     boolean isBackupActive(Long backupDeviceId);
 
-    void repairFailover(Long mainDeviceId);
-
     Map<String, String> getDeviceStatusInfo(MonitoringLog log);
 }

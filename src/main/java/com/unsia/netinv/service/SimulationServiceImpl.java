@@ -36,8 +36,10 @@ public class SimulationServiceImpl implements SimulationService {
     @PostConstruct
     @Override
     public void init() {
-        // scheduleFailure("192.168.1.6", 1);
+        // scheduleFailure("192.168.1.1", 1);
         // scheduleFailure("192.168.1.9", 1);
+        // scheduleFailure("192.168.1.4", 1);
+        // scheduleFailure("192.168.1.2", 1);
     }
 
     @Override

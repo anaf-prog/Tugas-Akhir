@@ -5,8 +5,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+import com.unsia.netinv.netinve.RecoveryType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,6 +44,11 @@ public class FailOverLogs {
 
     @Column(name = "status")
     private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recovery_type")
+    private RecoveryType recoveryType;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_device_id",referencedColumnName = "id", nullable = false)

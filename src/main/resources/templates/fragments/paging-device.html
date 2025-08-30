@@ -5,28 +5,28 @@
 
             <!-- First Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == 0} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{'/dashboard#device-list'(devicePage=0, 
-                                                      deviceSize=${deviceSize}, 
-                                                      logPage=${logCurrentPage}, 
-                                                      logSize=${param.logSize != null ? param.logSize : 5},
-                                                      search=${searchParam}, 
-                                                      status=${statusParam}, 
-                                                      type=${typeParam})}">
+                <a class="page-link ajax-page-link"
+                   th:href="@{'/dashboard'(devicePage=0, 
+                                           deviceSize=${deviceSize}, 
+                                           logPage=${logCurrentPage}, 
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           search=${searchParam}, 
+                                           status=${statusParam}, 
+                                           type=${typeParam})}">
                     <span>&laquo;</span>
                 </a>
             </li>
 
             <!-- Previous Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == 0} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{'/dashboard#device-list'(devicePage=${deviceCurrentPage - 1}, 
-                                                      deviceSize=${deviceSize}, 
-                                                      logPage=${logCurrentPage}, 
-                                                      logSize=${param.logSize != null ? param.logSize : 5},
-                                                      search=${searchParam}, 
-                                                      status=${statusParam}, 
-                                                      type=${typeParam})}">
+                <a class="page-link ajax-page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage - 1}, 
+                                           deviceSize=${deviceSize}, 
+                                           logPage=${logCurrentPage}, 
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           search=${searchParam}, 
+                                           status=${statusParam}, 
+                                           type=${typeParam})}">
                     <span>&lsaquo;</span>
                 </a>
             </li>
@@ -46,41 +46,41 @@
                 th:if="${i >= 0 and i < deviceTotalPages}"
                 class="page-item" 
                 th:classappend="${i == deviceCurrentPage} ? 'active'">
-                <a class="page-link"
-                   th:href="@{'/dashboard#device-list'(devicePage=${i}, 
-                                                      deviceSize=${deviceSize}, 
-                                                      logPage=${logCurrentPage}, 
-                                                      logSize=${param.logSize != null ? param.logSize : 5},
-                                                      search=${searchParam}, 
-                                                      status=${statusParam}, 
-                                                      type=${typeParam})}"
+                <a class="page-link ajax-page-link"
+                   th:href="@{'/dashboard'(devicePage=${i}, 
+                                           deviceSize=${deviceSize}, 
+                                           logPage=${logCurrentPage}, 
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           search=${searchParam}, 
+                                           status=${statusParam}, 
+                                           type=${typeParam})}"
                    th:text="${i + 1}">1</a>
             </li>
 
             <!-- Next Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == deviceTotalPages - 1} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{'/dashboard#device-list'(devicePage=${deviceCurrentPage + 1}, 
-                                                      deviceSize=${deviceSize}, 
-                                                      logPage=${logCurrentPage}, 
-                                                      logSize=${param.logSize != null ? param.logSize : 5},
-                                                      search=${searchParam}, 
-                                                      status=${statusParam}, 
-                                                      type=${typeParam})}">
+                <a class="page-link ajax-page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceCurrentPage + 1}, 
+                                           deviceSize=${deviceSize}, 
+                                           logPage=${logCurrentPage}, 
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           search=${searchParam}, 
+                                           status=${statusParam}, 
+                                           type=${typeParam})}">
                     <span>&rsaquo;</span>
                 </a>
             </li>
 
             <!-- Last Page -->
             <li class="page-item" th:classappend="${deviceCurrentPage == deviceTotalPages - 1} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{'/dashboard#device-list'(devicePage=${deviceTotalPages - 1}, 
-                                                      deviceSize=${deviceSize}, 
-                                                      logPage=${logCurrentPage}, 
-                                                      logSize=${param.logSize != null ? param.logSize : 5},
-                                                      search=${searchParam}, 
-                                                      status=${statusParam}, 
-                                                      type=${typeParam})}">
+                <a class="page-link ajax-page-link"
+                   th:href="@{'/dashboard'(devicePage=${deviceTotalPages - 1}, 
+                                           deviceSize=${deviceSize}, 
+                                           logPage=${logCurrentPage}, 
+                                           logSize=${param.logSize != null ? param.logSize : 5},
+                                           search=${searchParam}, 
+                                           status=${statusParam}, 
+                                           type=${typeParam})}">
                     <span>&raquo;</span>
                 </a>
             </li>

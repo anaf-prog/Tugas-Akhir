@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,21 +92,6 @@ public class FailoverServiceImpl implements FailoverService {
             boolean hasActiveFailover = failOverLogRepository.existsActiveFailover(mainDevice, route.getBackupDevice());
             return isMainOffline && hasActiveFailover;
         });
-    }
-
-    @Override
-    public void repairFailover(Long mainDeviceId) {
-        Device mainDevice = deviceRepository.findById(mainDeviceId)
-            .orElseThrow(() -> new RuntimeException("Perangkat tidak ditemukan"));
-
-        Optional<FailOverLogs> activeFailover = failOverLogRepository.findTopByMainDeviceAndRepairTimeIsNullOrderByWaktuDesc(mainDevice);
-        
-        if (activeFailover.isPresent()) {
-            FailOverLogs log = activeFailover.get();
-            log.setRepairTime(LocalDateTime.now());
-            failOverLogRepository.save(log);
-            logger.info("Failover diperbaiki untuk perangkat utama: {}", log.getMainDevice().getDeviceName());
-        }
     }
 
     // Method baru untuk mengecek dan memperbaiki failover yang sudah tidak diperlukan

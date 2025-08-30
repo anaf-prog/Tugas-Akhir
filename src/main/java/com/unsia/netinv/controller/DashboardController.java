@@ -15,6 +15,7 @@ import com.unsia.netinv.entity.Users;
 import com.unsia.netinv.service.DashboardService;
 import com.unsia.netinv.service.FailoverService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -28,34 +29,45 @@ public class DashboardController {
     private FailoverService failoverService;
 
     @GetMapping
-    public String showDasboard(@RequestParam(value = "devicePage", defaultValue = "0") int devicePage,
-                               @RequestParam(value = "deviceSize", defaultValue = "5") int deviceSize,
-                               @RequestParam(value = "logPage", defaultValue = "0") int logPage,
-                               @RequestParam(value = "logSize", defaultValue = "5") int logSize,
-                               @RequestParam(value = "failoverPage", defaultValue = "0") int failoverPage,
-                               @RequestParam(value = "failoverSize", defaultValue = "5") int failoverSize,
-                               @RequestParam(value = "search", required = false) String search,
-                               @RequestParam(value = "status", required = false) String status,
-                               @RequestParam(value = "type", required = false) String type,
-                               Model model, 
-                               HttpSession session) {
+    public String showDashboard(@RequestParam(value = "devicePage", defaultValue = "0") int devicePage,
+                             @RequestParam(value = "deviceSize", defaultValue = "5") int deviceSize,
+                             @RequestParam(value = "logPage", defaultValue = "0") int logPage,
+                             @RequestParam(value = "logSize", defaultValue = "5") int logSize,
+                             @RequestParam(value = "failoverPage", defaultValue = "0") int failoverPage,
+                             @RequestParam(value = "failoverSize", defaultValue = "5") int failoverSize,
+                             @RequestParam(value = "search", required = false) String search,
+                             @RequestParam(value = "status", required = false) String status,
+                             @RequestParam(value = "type", required = false) String type,
+                             Model model,
+                             HttpSession session,
+                             HttpServletRequest request) {
 
         Users user = (Users) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
 
-        Map<String, Object> dashboardData = dashboardService.getDashboardData(devicePage, deviceSize, logPage, logSize, 
-                                                                              failoverPage, failoverSize, search, status, type, user);
+        Map<String, Object> dashboardData = dashboardService.getDashboardData(
+                devicePage, deviceSize, logPage, logSize,
+                failoverPage, failoverSize, search, status, type, user);
         model.addAllAttributes(dashboardData);
 
         model.addAttribute("failoverService", failoverService);
-
         model.addAttribute("searchParam", search);
         model.addAttribute("statusParam", status);
         model.addAttribute("typeParam", type);
 
-        return "dashboard";
+         // TAMBAHAN: Simpan nilai card dalam session untuk backup
+        session.setAttribute("cardTotalDevices", dashboardData.get("totalDevices"));
+        session.setAttribute("cardActiveDevices", dashboardData.get("activeDevices"));
+        session.setAttribute("cardDownDevices", dashboardData.get("downDevices"));
+
+        // Jika AJAX → kirim hanya bagian #device-container
+        // if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+        //     return "fragments/perangkat-dashboard :: device-container"; // Render fragment dari template ini
+        // }
+
+        return "dashboard"; // Normal request
 
     }
 
